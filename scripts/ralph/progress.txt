@@ -391,3 +391,100 @@ powershell -ExecutionPolicy Bypass -File scripts\ralph\ralph-win.ps1 -MaxIterati
 All 16 user stories have been implemented and verified.
 
 ---
+
+## Phase 3: Production Deployment
+
+---
+
+## 2026-01-23 - GitHub Repository Created
+
+- Created GitHub repository: https://github.com/Superdude22/theknot-website
+- Initialized git in astro-site directory
+- Created .gitignore (node_modules, dist, .env, etc.)
+- Pushed all 166 files to main branch
+- Updated keystatic.config.ts for production GitHub mode
+- Updated astro.config.mjs to hybrid output mode
+
+**Repository URL:** https://github.com/Superdude22/theknot-website
+
+---
+
+## Deployment Steps (Manual)
+
+### Step 1: Create GitHub OAuth App for Keystatic
+
+1. Go to GitHub → Settings → Developer settings → OAuth Apps → New OAuth App
+2. Fill in:
+   - **Application name:** The Knot CMS
+   - **Homepage URL:** https://dev.climbtheknot.com
+   - **Authorization callback URL:** https://dev.climbtheknot.com/api/keystatic/github/oauth/callback
+3. Click "Register application"
+4. Generate a new client secret
+5. Copy **Client ID** and **Client Secret** for Cloudflare environment variables
+
+### Step 2: Deploy to Cloudflare Pages
+
+1. Go to Cloudflare Dashboard → Pages → Create a project
+2. Connect to Git → Select GitHub → Authorize Cloudflare
+3. Select repository: `Superdude22/theknot-website`
+4. Configure build settings:
+   - **Project name:** theknot-website
+   - **Production branch:** main
+   - **Framework preset:** Astro
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+5. Click "Save and Deploy"
+
+### Step 3: Configure Environment Variables
+
+In Cloudflare Pages → theknot-website → Settings → Environment variables:
+
+| Variable | Value | Encrypt |
+|----------|-------|---------|
+| `KEYSTATIC_GITHUB_CLIENT_ID` | (from GitHub OAuth App) | No |
+| `KEYSTATIC_GITHUB_CLIENT_SECRET` | (from GitHub OAuth App) | Yes |
+| `KEYSTATIC_SECRET` | (generate random 32+ char string) | Yes |
+| `NODE_ENV` | `production` | No |
+
+Generate KEYSTATIC_SECRET:
+```bash
+openssl rand -base64 32
+```
+
+### Step 4: Configure Custom Domain
+
+1. In Cloudflare Pages → theknot-website → Custom domains
+2. Add domain: `dev.climbtheknot.com`
+3. Cloudflare will auto-configure DNS if domain is already on Cloudflare
+
+### Step 5: Verify Deployment
+
+1. Visit https://dev.climbtheknot.com - should show the home page
+2. Visit https://dev.climbtheknot.com/keystatic - should show GitHub login
+3. Log in with GitHub account that has write access to the repo
+4. Verify you can edit content through the Keystatic admin UI
+
+---
+
+## Configuration Files Updated
+
+**keystatic.config.ts:**
+```typescript
+storage:
+  process.env.NODE_ENV === 'production'
+    ? {
+        kind: 'github',
+        repo: 'Superdude22/theknot-website',
+      }
+    : {
+        kind: 'local',
+      },
+```
+
+**astro.config.mjs:**
+```javascript
+output: 'hybrid',  // Required for Keystatic admin routes
+adapter: cloudflare(),
+```
+
+---
