@@ -1,8 +1,8 @@
 # The Knot - Astro + Keystatic Migration Handoff
 
-## Project Status: Phase 1 Complete
+## Project Status: Phase 2 Complete (Pages Migrated)
 
-The foundation for the new Astro + Keystatic website has been built. The dev server runs and the Keystatic admin UI is accessible.
+Core site pages have been migrated to Astro, Keystatic is wired up, and `npm run build` succeeds with the Cloudflare adapter.
 
 ---
 
@@ -41,6 +41,8 @@ TheKnot/astro-site/
         └── global.css        # Font faces, CSS variables, Tailwind
 ```
 
+Note: Keystatic admin/API routes are now provided by the `@keystatic/astro` integration (the manual `src/pages/keystatic/*` and `src/pages/api/keystatic/*` route files were removed to avoid Astro 5 build issues).
+
 ### Keystatic Schemas Defined
 
 **Singletons (one-off content):**
@@ -62,10 +64,11 @@ TheKnot/astro-site/
 
 ### Key Technical Details
 
-1. **Output Mode**: `static` with `prerender = false` on Keystatic routes
+1. **Output Mode**: `output: 'static'` (Astro 5) with Cloudflare adapter
 2. **Brand Colors**: CSS variables in `:root`, Tailwind references them via `var(--color-*)`
 3. **React Islands**: HeaderMobile.tsx and Accordion.tsx use `client:load` / `client:visible`
 4. **Fonts**: Loaded via @font-face in global.css
+5. **Keystatic Routes**: Provided by `@keystatic/astro` integration (no manual routes in `src/pages/keystatic` or `src/pages/api/keystatic`)
 
 ---
 
@@ -81,33 +84,11 @@ npm run dev
 
 ---
 
-## What's Next (Phase 2 - Ralph PRD)
+## What's Next (Phase 3 - Production Deployment)
 
-Create a Ralph PRD to migrate remaining pages:
-
-### Page Migration Stories
-- `KNOT-010`: Migrate About page
-- `KNOT-011`: Migrate Membership page
-- `KNOT-012`: Migrate New Climber page
-- `KNOT-013`: Migrate Amenities page
-- `KNOT-014`: Migrate Events listing page
-- `KNOT-015`: Migrate Event detail page ([slug])
-- `KNOT-016`: Migrate Shop page
-- `KNOT-017`: Migrate Classes page
-
-### Content Extraction Stories
-- `KNOT-020`: Extract team member data from existing About page to `content/team/*.json`
-- `KNOT-021`: Extract policies/accordion content to `content/policies/*.json`
-- `KNOT-022`: Create sample event entries in `content/events/*.json`
-
-### Acceptance Criteria Pattern
-Each page story should:
-1. Create the `.astro` page file
-2. Use BaseLayout with appropriate title
-3. Pull content from hardcoded defaults (Keystatic content optional)
-4. Match visual structure of existing Next.js page
-5. Be mobile responsive
-6. Return 200 on dev server
+1. Create GitHub OAuth App for Keystatic and set Cloudflare env vars (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, `NODE_ENV=production`)
+2. Deploy repo to Cloudflare Pages (`npm run build`, output `dist`)
+3. Add custom domain (e.g. `dev.climbtheknot.com`) and verify `/keystatic` login + editing
 
 ---
 

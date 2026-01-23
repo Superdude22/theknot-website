@@ -9,6 +9,7 @@ dist/
 
 # Wrangler (Cloudflare)
 .wrangler/
+.git_disabled/
 
 # Environment variables
 .env

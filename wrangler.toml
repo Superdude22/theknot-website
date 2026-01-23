@@ -1,3 +1,8 @@
 name = "theknot-website"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "./dist"
+
+[[kv_namespaces]]
+binding = "SESSION"
+id = "a134e104017c4111af5973a85d7d43de"
+preview_id = "9ced4b54c59f43b4aee1c310dae6a798"

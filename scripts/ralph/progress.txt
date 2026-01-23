@@ -483,8 +483,18 @@ storage:
 
 **astro.config.mjs:**
 ```javascript
-output: 'hybrid',  // Required for Keystatic admin routes
+output: 'static',  // Astro 5: non-prerendered Keystatic routes still work
 adapter: cloudflare(),
 ```
+
+---
+
+## 2026-01-23 - Build fix: Astro 5 + Keystatic routes
+
+- Updated `astro.config.mjs` to use `output: 'static'` (Astro 5 removed `output: 'hybrid'`)
+- Removed duplicate manual routes:
+  - `src/pages/keystatic/[...path].astro`
+  - `src/pages/api/keystatic/[...path].ts`
+- Verified `npm run build` succeeds (Cloudflare adapter)
 
 ---

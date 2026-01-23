@@ -6,9 +6,14 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-  // Static output with server routes for Keystatic admin (hybrid behavior is now default)
+  // Astro 5: static mode supports SSR routes (used by Keystatic)
   output: 'static',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    routes: {
+      // Include keystatic routes for SSR
+      include: ['/keystatic/*', '/api/keystatic/*'],
+    },
+  }),
   integrations: [
     react(),
     tailwind(),
