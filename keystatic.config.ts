@@ -1,10 +1,15 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 
 export default config({
-  storage: {
-    // Use 'local' for development, switch to 'github' for production
-    kind: 'local',
-  },
+  storage:
+    process.env.NODE_ENV === 'production'
+      ? {
+          kind: 'github',
+          repo: 'Superdude22/theknot-website',
+        }
+      : {
+          kind: 'local',
+        },
 
   singletons: {
     // =========================================

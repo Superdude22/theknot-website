@@ -6,7 +6,8 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',
+  // Hybrid mode: static pages by default, but allows server routes for Keystatic admin
+  output: 'hybrid',
   adapter: cloudflare(),
   integrations: [
     react(),
