@@ -86,7 +86,7 @@ npm run dev
 
 ## What's Next (Phase 3 - Production Deployment)
 
-1. Create GitHub OAuth App for Keystatic and set Cloudflare env vars (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, `NODE_ENV=production`)
+1. Create a GitHub **App** for Keystatic and set Cloudflare env vars (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, `NODE_ENV=production`, `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`)
 2. Deploy repo to Cloudflare Pages (`npm run build`, output `dist`)
 3. Add custom domain (e.g. `dev.climbtheknot.com`) and verify `/keystatic` login + editing
 
@@ -121,7 +121,7 @@ For production with Keystatic GitHub mode:
      repo: 'OWNER/theknot-website',
    }
    ```
-3. Create GitHub OAuth app for Keystatic auth
+3. Create GitHub App for Keystatic auth
 4. Deploy to Cloudflare Pages
 5. Configure `dev.climbtheknot.com` DNS
 
