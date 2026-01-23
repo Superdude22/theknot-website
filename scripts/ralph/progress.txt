@@ -1,0 +1,393 @@
+# Ralph Progress Log - The Knot Astro Migration
+
+## Phase 2: Page Migration (16 stories)
+
+---
+
+## 2026-01-22 - Setup
+
+Ralph orchestrator configured for Astro + Keystatic migration.
+
+**Stories to complete:**
+- KNOT-010: About page
+- KNOT-011: Membership page
+- KNOT-012: New Climbers page
+- KNOT-013: Amenities page
+- KNOT-014: Events listing
+- KNOT-015: Event detail template
+- KNOT-016: Shop page
+- KNOT-017: Classes page
+- KNOT-020: Team Keystatic content
+- KNOT-021: Policies Keystatic content
+- KNOT-022: Events Keystatic content
+- KNOT-023: Navigation links
+- KNOT-024: Modal component
+- KNOT-025: Final integration test
+
+**Run command:**
+```powershell
+cd c:\World\TheKnot\astro-site
+powershell -ExecutionPolicy Bypass -File scripts\ralph\ralph-win.ps1 -MaxIterations 20
+```
+
+---
+
+## 2026-01-22 - KNOT-010: Migrate About page
+
+- Created `src/pages/about.astro` with full page content copied from Next.js
+- Created `src/components/TeamMemberCard.astro` component with blue-black/grayscale filters
+- Hero section with building facade background and yellow overlay
+- Core Values accordion (5 items: Consciously Aware, Radically Bold, Impact Driven, Remain Authentic, Get Stoked Stay Stoked)
+- 3 team sections: Owners & Managers, Coordinators, Desk Staff & Instructors (20 total members)
+- FAQ accordion (6 items) with feedback buttons
+- Mobile responsive layout
+- Page returns 200 at http://127.0.0.1:4321/about
+
+**Files created:**
+- src/pages/about.astro
+- src/components/TeamMemberCard.astro
+
+**Learnings:**
+- Accordion component uses React island with client:visible directive
+- Team images at /images/canva-final/team-*.jpg and staff-*.jpg
+---
+
+## 2026-01-22 - KNOT-011: Migrate Membership page
+
+- Created `src/pages/membership.astro` with full page content copied from Next.js
+- Hero section with video background (membership-hero.mp4) and fallback image
+- REDPOINT MEMBER PORTAL button linking to portal.climbtheknot.com
+- Pricing section with facility photo and $80/month pricing, JOIN NOW button
+- Policies accordion (5 items: Billing & Payments, Membership Freeze, Cancellations, Kids Policies, Youth Memberships)
+- Member Benefits list with 7 items and teal checkmark icons
+- Local Discounts section with 15% tier (3 businesses) and 10% tier (4 businesses)
+- Google Maps embed for gym location
+- Mobile responsive layout
+- Page builds and prerenders successfully
+
+**Files created:**
+- src/pages/membership.astro
+- src/content/brand.json (required for BaseLayout)
+- src/content/announcement.json (required for BaseLayout)
+
+**Files removed:**
+- src/pages/keystatic/[...path].astro (duplicate route - handled by Keystatic integration)
+
+**Learnings:**
+- BaseLayout requires brand.json and announcement.json to exist
+- Keystatic integration auto-creates /keystatic routes, no need for manual page
+---
+
+## 2026-01-22 - KNOT-012: Migrate New Climbers page
+
+- Created `src/pages/new-climber.astro` with full page content copied from Next.js
+- Hero section with video background (newclimbers-hero.mp4) and red overlay
+- Welcome section with climbing shoes image (newclimbers-shoes.jpg)
+- Day pass pricing section with $25 display and facility staff photo
+- Activities 3-card section with placeholder images and external links (Intro Class, Private Belayer, Schedule)
+- Safety & Etiquette accordion with 5 items:
+  - Climb At Your Own Risk! (default open)
+  - Indoor Climbing Etiquette
+  - Route Grades
+  - Kids Policies
+  - Code of Conduct
+- Mobile responsive layout
+- Page builds and prerenders successfully
+
+**Files created:**
+- src/pages/new-climber.astro
+- src/components/NewClimberSafetyAccordion.tsx
+
+**Learnings:**
+- JSX fragments in Astro props don't work; must pass JSX as component children or create dedicated components
+- Created NewClimberSafetyAccordion.tsx with all content embedded to avoid Astro/JSX interop issues
+- The accordion supports rich HTML content (nested lists, subheadings, etc.)
+---
+
+## 2026-01-22 - KNOT-013: Migrate Amenities page
+
+- Created `src/pages/amenities.astro` with full page content copied from Next.js
+- Hero section with design slide background image
+- "MORE THAN JUST CLIMBING" heading
+- 6 amenity cards in 2 rows (3x2 grid):
+  - Row 1: Bouldering, Top-Rope, Yoga & Fitness Classes
+  - Row 2: Free Gear Rental, Free Belay Classes, Training Area & Showers
+- Amenity cards have placeholder sky/hills SVG backgrounds with labels
+- CTA buttons: CLASS SCHEDULE and BELAY CLASSES (linking to portal)
+- Gym tour video placeholder section with play icon
+- Mobile responsive (single column on mobile)
+- Page builds and prerenders successfully
+
+**Files created:**
+- src/pages/amenities.astro
+
+**Learnings:**
+- Amenity cards are static (no React island needed)
+- All content is hardcoded as in Next.js source
+---
+
+## 2026-01-23 - KNOT-014: Migrate Events listing page
+
+- Created `src/pages/events/index.astro` with full page content copied from Next.js
+- Hero section with design slide background image (/images/events/hero-design-slide.png)
+- Video placeholder box for gym tour
+- Featured event section with REGISTRATION & MORE INFO button
+- Event grid with 5 placeholder events (EVENT 1-5) with sky/hills SVG placeholders
+- Event types accordion (6 items):
+  - Bouldering Only
+  - Top Rope + Bouldering
+  - Staff Belay
+  - Yoga or Fitness Class
+  - Belay Class
+  - Kids Policies
+- Event request form buttons (Event Request Form, Contact Us)
+- Up ENDing Parkinsons section with link and placeholder image
+- Register Here CTA button
+- Mobile responsive layout
+- Page returns 200 at http://127.0.0.1:4321/events
+
+**Files created:**
+- src/pages/events/index.astro
+
+**Learnings:**
+- Created events directory for events/index.astro route
+- Reused existing Accordion.tsx component with client:visible
+- Event cards are static - modal interaction would require React island (not implemented in this story)
+---
+
+## 2026-01-23 - KNOT-015: Migrate Event detail page template
+
+- Created `src/pages/events/[slug].astro` dynamic route
+- Uses Astro's getStaticPaths to generate pages from content/events collection
+- Event hero with title, date, and time (formatted with toLocaleDateString)
+- Placeholder SVG background when no event image is set
+- Event description section with recurring event badge support
+- Sidebar with event details card (date, time, location)
+- Registration button (only shown when registrationLink is present)
+- Location display: The Knot Climbing Gym, 619 S Main St, Gainesville, FL 32601
+- Back to All Events link
+- Fallback 404 redirect for unknown slugs
+- Mobile responsive with sidebar moving above content on small screens
+- Created sample event: `src/content/events/spring-climbing-competition.json`
+- Page builds successfully at /events/spring-climbing-competition/
+
+**Files created:**
+- src/pages/events/[slug].astro
+- src/content/events/spring-climbing-competition.json
+
+**Learnings:**
+- Keystatic uses simple string title in Astro content schema (not slug object)
+- getStaticPaths uses event.id as the slug parameter
+- Build prerendering confirms page works: `/events/spring-climbing-competition/index.html`
+---
+
+## 2026-01-23 - KNOT-016: Migrate Shop page
+
+- Created `src/pages/shop.astro` with full page content copied from Next.js
+- Hero section with animated sky/hills SVG background and goat icon
+- "SHOP" headline with white text shadow
+- Gear store button linking to portal.climbtheknot.com/gnv/shop
+- Category navigation with 4 categories (Apparel, Essentials, Top-Rope Gear, Climbing Shoes)
+- Product grids for each category with placeholder products:
+  - Apparel: 10 products
+  - Essentials: 5 products
+  - Top-Rope Gear: 5 products
+  - Climbing Shoes: 5 products
+- Product cards with sky/hills SVG placeholder images
+- Product modal with size/color selectors (React island: ShopPageClient.tsx)
+- Mobile responsive (2-column grid on mobile)
+- Page builds and prerenders successfully at /shop/
+
+**Files created:**
+- src/pages/shop.astro
+- src/components/ShopPageClient.tsx (React island with all shop interactivity)
+- src/components/ProductModal.tsx (Product detail modal with size/color selectors)
+
+**Learnings:**
+- Shop page requires client-side interactivity for category smooth-scroll and product modals
+- Combined all interactive elements into single ShopPageClient.tsx component for cleaner architecture
+- ProductModal.tsx handles size/color selection state and escape key closing
+---
+
+## 2026-01-23 - KNOT-017: Migrate Classes page
+
+- Created `src/pages/classes.astro` with full page content copied from Next.js
+- Hero section with events design slide background (/images/events/hero-design-slide.png)
+- "CLASSES" headline positioned bottom-right
+- LEARN & GROW intro section with descriptive text
+- Weekly schedule grid (7 days: Monday through Sunday)
+  - Each day shows class names with times
+  - Sunday shows "Open Climb - No Classes"
+- Class types accordion with 6 class types:
+  - Intro to Climbing (1.5 hrs, Beginner, $ Additional Fee)
+  - Belay Certification (2 hrs, Beginner, ✓ Free with Membership)
+  - Top-Rope Technique (1.5 hrs, Intermediate, ✓ Free with Membership)
+  - Bouldering Basics (1 hr, All Levels, ✓ Free with Membership)
+  - Yoga for Climbers (1 hr, All Levels, ✓ Free with Membership)
+  - Strength & Conditioning (1 hr, Intermediate/Advanced, ✓ Free with Membership)
+- Created ClassesAccordion.tsx component with duration/level/included metadata display
+- Private lessons pricing cards:
+  - 1-Hour Session: $60 per person
+  - 4-Session Package: $200 (Save $40!)
+- READY TO START CTA section with rust background
+  - BOOK A CLASS button (links to portal.climbtheknot.com/gnv/classes)
+  - BECOME A MEMBER button (links to /membership)
+- Mobile responsive layout
+- Page builds and prerenders successfully at /classes/
+
+**Files created:**
+- src/pages/classes.astro
+- src/components/ClassesAccordion.tsx
+
+**Learnings:**
+- Created dedicated ClassesAccordion.tsx because existing Accordion.tsx doesn't support class metadata
+- Schedule data is hardcoded as in Next.js source
+- All class content copied verbatim from Next.js page
+---
+
+## 2026-01-23 - KNOT-020: Create team member Keystatic content
+
+- Created 20 team member JSON files in `src/content/team/`
+- Leadership team (5 members, isLeadership: true, order 1-5):
+  - mike-palmer.json (Owner / CEO)
+  - mitch-eadens.json (Owner / COO)
+  - tulsa-curtis.json (Operations Manager)
+  - ashley-marcone.json (Head Setter)
+  - zach-landry.json (Risk Mgmt & Tech Mgr)
+- Coordinators (5 members, order 10-14):
+  - ash.json, claudia.json, rick.json, amanda.json, natalie.json
+- Desk Staff (10 members, order 20-29):
+  - g.json, ben.json, andrew.json, steve.json, carley.json
+  - talia.json, sarah.json, shane.json, yan.json, aaron.json
+- All entries follow Astro content schema (simple name string, not Keystatic slug object)
+- Dev server starts successfully with all team content synced
+
+**Files created:**
+- src/content/team/*.json (20 files)
+
+**Learnings:**
+- Astro content schema expects `name: string`, not Keystatic's slug field format `{name: {name, slug}}`
+- Keep JSON structure simple to match Astro's defineCollection schema in config.ts
+---
+
+## 2026-01-23 - KNOT-021: Create policies Keystatic content
+
+- Created 8 policy JSON files in `src/content/policies/`
+- Extracted FAQ content from About page (Next.js source):
+  - day-passes.json (order 1) - $25 day pass info
+  - membership-includes.json (order 2) - membership benefits summary
+  - billing.json (order 3) - billing workflow with UPDATE BILLING button
+  - experience-required.json (order 4) - beginner-friendly message
+  - hours.json (order 5) - gym hours (Mon-Fri 6am-10pm, Sat 8am-8pm, Sun 9am-6pm)
+  - feedback.json (order 6) - feedback submission with SUBMIT FEEDBACK button
+- Extracted policies from Membership page accordion:
+  - kids.json (order 7) - kids policies with age requirements and supervision ratios
+  - youth-memberships.json (order 8) - Kids $25/mo, Youth $45/mo pricing
+- All entries use Keystatic document field format with paragraph/list structures
+- Build completes successfully with all policies synced
+
+**Files created:**
+- src/content/policies/day-passes.json
+- src/content/policies/membership-includes.json
+- src/content/policies/billing.json
+- src/content/policies/experience-required.json
+- src/content/policies/hours.json
+- src/content/policies/feedback.json
+- src/content/policies/kids.json
+- src/content/policies/youth-memberships.json
+
+**Learnings:**
+- Astro content schema expects `title: string`, not Keystatic's slug field format
+- Keystatic document field content is an array of block objects (paragraph, unordered-list, etc.)
+- Initial attempt with Keystatic slug object format failed Astro validation
+---
+
+## 2026-01-23 - KNOT-022: Create sample event entries
+
+- Created 5 sample event JSON files in `src/content/events/`
+- Content copied verbatim from Next.js events page event array:
+  - event-1.json (2026-02-15, 6:00 PM - 9:00 PM, with registration)
+  - event-2.json (2026-02-22, 2:00 PM - 6:00 PM, with registration)
+  - event-3.json (2026-03-01, 10:00 AM - 4:00 PM, youth climbing day, no registration)
+  - event-4.json (2026-03-08, All Day, spring competition, with registration)
+  - event-5.json (2026-03-15, 7:00 PM - 10:00 PM, social climb, no registration)
+- All entries follow Keystatic events schema (title, date, time, description, registrationLink, isFeatured, isRecurring)
+- 6 total events now in collection (including existing spring-climbing-competition.json)
+
+**Files created:**
+- src/content/events/event-1.json
+- src/content/events/event-2.json
+- src/content/events/event-3.json
+- src/content/events/event-4.json
+- src/content/events/event-5.json
+
+**Learnings:**
+- Schema uses registrationLink (not registrationUrl) and isFeatured/isRecurring booleans
+- No hasRegistration field needed - presence of registrationLink implies registration available
+---
+
+## 2026-01-23 - KNOT-023: Update navigation links
+
+- Verified Header.astro navigation links already point to correct pages
+- Links: /about, /new-climber, /membership, /classes, /amenities, /events, /shop
+- HeaderMobile.tsx receives navItems via props from Header.astro
+- Active state styling implemented with header__nav-link--active class (uses var(--color-rust))
+- All pages build and prerender successfully
+- No changes needed - Header was already correctly configured
+
+**Files verified:**
+- src/components/Header.astro (lines 15-23 define navItems)
+- src/components/HeaderMobile.tsx (receives navItems as props)
+
+**Learnings:**
+- Header navigation was already configured correctly in previous migration work
+- Active state uses currentPath comparison with Astro.url.pathname
+---
+
+## 2026-01-23 - KNOT-024: Add Modal component for Events and Shop
+
+- Created `src/components/Modal.tsx` React island component
+- Ported from existing Next.js Modal.tsx with the following features:
+  - Single-column layout (default): 600px max-width with 32px padding
+  - Two-column layout: 900px max-width with image column + content column
+  - Light theme: sand background, rounded corners
+  - Dark theme: graphite background, white border
+  - Click-outside-to-close on overlay click
+  - Escape key closes modal
+  - Focus trap: Tab/Shift+Tab cycles through focusable elements
+  - Focus restoration: Returns focus to trigger element on close
+  - Body scroll lock when modal is open
+  - ModalCloseButton subcomponent with hover effects and focus outline
+- Uses CSS variables for brand colors (var(--color-graphite), var(--color-sand), var(--color-limestone))
+- Animations: fadeIn for overlay, slideIn for modal container
+- Mobile responsive: two-column layout stacks vertically on screens < 768px
+- Dev server runs successfully
+
+**Files created:**
+- src/components/Modal.tsx
+
+**Learnings:**
+- Converted styled-jsx to standard inline <style> tags for React compatibility
+- Added lightTheme prop to ModalCloseButton for proper stroke/border color contrast
+---
+
+## 2026-01-23 - KNOT-025: Final integration test
+
+- Ran dev server and verified all pages render correctly
+- **All pages return HTTP 200:**
+  - http://127.0.0.1:4321/ (home)
+  - http://127.0.0.1:4321/about
+  - http://127.0.0.1:4321/membership
+  - http://127.0.0.1:4321/new-climber
+  - http://127.0.0.1:4321/amenities
+  - http://127.0.0.1:4321/events
+  - http://127.0.0.1:4321/shop
+  - http://127.0.0.1:4321/classes
+  - http://127.0.0.1:4321/keystatic (admin UI)
+- Navigation links verified in Header.astro and HeaderMobile.tsx
+- Dev server starts with only expected warnings (empty content directories, Sharp runtime)
+
+**Phase 2 Complete!**
+All 16 user stories have been implemented and verified.
+
+---

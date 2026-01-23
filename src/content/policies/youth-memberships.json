@@ -1,0 +1,65 @@
+{
+  "title": "Youth Memberships",
+  "content": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "Kids & Youth memberships must be attached to a full-price adult membership ($80/month) and do not receive full member benefits. Check out our membership page for more info on benefits and registration."
+        }
+      ]
+    },
+    {
+      "type": "unordered-list",
+      "children": [
+        {
+          "type": "list-item",
+          "children": [
+            {
+              "type": "list-item-content",
+              "children": [
+                {
+                  "text": "Kids Membership (Ages 5 - 12): $25/month"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "list-item",
+          "children": [
+            {
+              "type": "list-item-content",
+              "children": [
+                {
+                  "text": "Youth Membership (Ages 13 - 17): $45/month"
+                }
+              ]
+            },
+            {
+              "type": "unordered-list",
+              "children": [
+                {
+                  "type": "list-item",
+                  "children": [
+                    {
+                      "type": "list-item-content",
+                      "children": [
+                        {
+                          "text": "Minors 16 and older have the option to sign up for an Adult Membership or a Youth Membership. Take a look at the benefits on our member page."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "buttonText": "MEMBERSHIP PAGE",
+  "buttonLink": "/membership#benefits",
+  "order": 8
+}

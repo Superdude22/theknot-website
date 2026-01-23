@@ -1,0 +1,276 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShopPageClient from '../components/ShopPageClient.tsx';
+---
+
+<BaseLayout title="Shop">
+  <main class="shop-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-background">
+        <div class="sky"></div>
+        <div class="clouds">
+          <div class="cloud cloud-1"></div>
+          <div class="cloud cloud-2"></div>
+          <div class="cloud cloud-3"></div>
+        </div>
+        <div class="hills">
+          <div class="hill hill-back"></div>
+          <div class="hill hill-mid"></div>
+          <div class="hill hill-front">
+            <div class="goat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <ellipse cx="12" cy="14" rx="8" ry="6" />
+                <circle cx="16" cy="10" r="4" />
+                <path d="M18 8 L20 5" stroke="white" stroke-width="2" />
+                <path d="M19 8 L21 6" stroke="white" stroke-width="2" />
+                <ellipse cx="8" cy="19" rx="1.5" ry="3" />
+                <ellipse cx="16" cy="19" rx="1.5" ry="3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-content">
+        <h1 class="hero-headline">SHOP</h1>
+      </div>
+
+      <a
+        href="https://portal.climbtheknot.com/gnv/shop"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="gear-store-button"
+      >
+        Gear store
+      </a>
+    </section>
+
+    <!-- Client-side interactive content -->
+    <ShopPageClient client:load />
+  </main>
+</BaseLayout>
+
+<style>
+  .shop-page {
+    min-height: 100vh;
+    background: #fff;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background: linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 100%);
+  }
+
+  .clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+  }
+
+  .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.9;
+  }
+
+  .cloud::before,
+  .cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .cloud-1 {
+    width: 100px;
+    height: 50px;
+    top: 8%;
+    left: 10%;
+  }
+
+  .cloud-1::before {
+    width: 60px;
+    height: 40px;
+    top: -20px;
+    left: 15px;
+  }
+
+  .cloud-1::after {
+    width: 50px;
+    height: 35px;
+    top: -15px;
+    left: 50px;
+  }
+
+  .cloud-2 {
+    width: 120px;
+    height: 55px;
+    top: 12%;
+    right: 15%;
+  }
+
+  .cloud-2::before {
+    width: 70px;
+    height: 45px;
+    top: -25px;
+    left: 20px;
+  }
+
+  .cloud-2::after {
+    width: 55px;
+    height: 38px;
+    top: -18px;
+    left: 60px;
+  }
+
+  .cloud-3 {
+    width: 80px;
+    height: 40px;
+    top: 18%;
+    left: 55%;
+  }
+
+  .cloud-3::before {
+    width: 50px;
+    height: 35px;
+    top: -18px;
+    left: 10px;
+  }
+
+  .cloud-3::after {
+    width: 40px;
+    height: 28px;
+    top: -12px;
+    left: 40px;
+  }
+
+  .hills {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+  }
+
+  .hill {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50% 50% 0 0;
+  }
+
+  .hill-back {
+    width: 120%;
+    height: 70%;
+    left: -10%;
+    background: #90EE90;
+  }
+
+  .hill-mid {
+    width: 80%;
+    height: 65%;
+    right: -5%;
+    background: #7CCD7C;
+  }
+
+  .hill-front {
+    width: 60%;
+    height: 55%;
+    left: -5%;
+    background: #7CCD7C;
+    z-index: 1;
+  }
+
+  .goat-icon {
+    position: absolute;
+    top: 5%;
+    left: 25%;
+  }
+
+  .hero-content {
+    position: absolute;
+    bottom: 15%;
+    right: 8%;
+    z-index: 2;
+  }
+
+  .hero-headline {
+    font-family: 'Zing Rust', 'Impact', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .gear-store-button {
+    position: absolute;
+    top: 15%;
+    right: 8%;
+    z-index: 2;
+    padding: 14px 24px;
+    background: var(--color-rust);
+    color: #fff;
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .gear-store-button:hover {
+    opacity: 0.9;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 40vh;
+      min-height: 300px;
+    }
+
+    .hero-headline {
+      font-size: 42px;
+    }
+
+    .hero-content {
+      bottom: 10%;
+      right: 5%;
+    }
+
+    .gear-store-button {
+      top: 10%;
+      right: 5%;
+      padding: 12px 20px;
+      font-size: 13px;
+    }
+  }
+</style>

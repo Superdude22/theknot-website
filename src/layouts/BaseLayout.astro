@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AnnouncementBanner from '../components/AnnouncementBanner.astro';
+
+// Import brand settings from Keystatic (if exists)
+let brandColors = {
+  rust: '#B94237',
+  limestone: '#D0D96F',
+  manatee: '#84BABF',
+  coral: '#D89B92',
+  surf: '#0B4F6C',
+  deepWater: '#073447',
+  milkweed: '#F2F3AE',
+  graphite: '#39393B',
+  sand: '#FAF9F5',
+};
+
+let announcement = {
+  enabled: false,
+  text: '',
+  linkText: '',
+  linkUrl: '',
+  backgroundColor: 'rust',
+};
+
+// Try to load brand settings from content (graceful fallback)
+try {
+  const brandFile = await import('../content/brand.json').catch(() => null);
+  if (brandFile?.default?.colors) {
+    brandColors = { ...brandColors, ...brandFile.default.colors };
+  }
+} catch (e) {
+  // Use defaults
+}
+
+// Try to load announcement settings
+try {
+  const announcementFile = await import('../content/announcement.json').catch(() => null);
+  if (announcementFile?.default) {
+    announcement = { ...announcement, ...announcementFile.default };
+  }
+} catch (e) {
+  // Use defaults
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  isHome?: boolean;
+}
+
+const { title, description = 'The Knot Climbing Gym - Gainesville\'s premier climbing facility', isHome = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/images/logos/Favicon 45.png" />
+    <title>{title} | The Knot Climbing Gym</title>
+
+    <!-- Inject brand colors as CSS variables -->
+    <style define:vars={{
+      'color-rust': brandColors.rust,
+      'color-limestone': brandColors.limestone,
+      'color-manatee': brandColors.manatee,
+      'color-coral': brandColors.coral,
+      'color-surf': brandColors.surf,
+      'color-deep-water': brandColors.deepWater,
+      'color-milkweed': brandColors.milkweed,
+      'color-graphite': brandColors.graphite,
+      'color-sand': brandColors.sand,
+    }}>
+      :root {
+        --color-rust: var(--color-rust);
+        --color-limestone: var(--color-limestone);
+        --color-manatee: var(--color-manatee);
+        --color-coral: var(--color-coral);
+        --color-surf: var(--color-surf);
+        --color-deep-water: var(--color-deep-water);
+        --color-milkweed: var(--color-milkweed);
+        --color-graphite: var(--color-graphite);
+        --color-sand: var(--color-sand);
+      }
+    </style>
+  </head>
+  <body>
+    {announcement.enabled && (
+      <AnnouncementBanner
+        text={announcement.text}
+        linkText={announcement.linkText}
+        linkUrl={announcement.linkUrl}
+        backgroundColor={announcement.backgroundColor}
+      />
+    )}
+
+    <Header isHome={isHome} showAnnouncement={announcement.enabled} />
+
+    <main>
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

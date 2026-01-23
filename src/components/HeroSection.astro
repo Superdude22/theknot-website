@@ -1,0 +1,169 @@
+---
+interface Props {
+  headline: string;
+  subtext: string[];
+  buttonText: string;
+  buttonLink: string;
+  backgroundVideo?: string;
+  backgroundImage?: string;
+}
+
+const {
+  headline,
+  subtext,
+  buttonText,
+  buttonLink,
+  backgroundVideo,
+  backgroundImage = '/images/canva-final/home-hero-bg.jpg',
+} = Astro.props;
+---
+
+<section class="hero">
+  <!-- Background -->
+  <div class="hero__background">
+    {backgroundVideo ? (
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        class="hero__video"
+      >
+        <source src={backgroundVideo} type="video/mp4" />
+      </video>
+    ) : (
+      <img
+        src={backgroundImage}
+        alt=""
+        class="hero__image"
+        loading="eager"
+      />
+    )}
+    <div class="hero__overlay"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="hero__content">
+    <h1 class="hero__headline">{headline}</h1>
+    <div class="hero__subtext">
+      {subtext.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+    </div>
+    <a href={buttonLink} class="btn-primary hero__button">
+      {buttonText}
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+  }
+
+  .hero__video,
+  .hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 120px 24px 80px;
+    max-width: 900px;
+  }
+
+  .hero__headline {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 400;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0 0 32px 0;
+    line-height: 1;
+  }
+
+  .hero__subtext {
+    margin-bottom: 40px;
+  }
+
+  .hero__subtext p {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+
+  .hero__subtext p:last-child {
+    margin-bottom: 0;
+  }
+
+  .hero__button {
+    min-width: 225px;
+    min-height: 55px;
+  }
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .hero__headline {
+      font-size: 56px;
+    }
+
+    .hero__subtext p {
+      font-size: 16px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .hero__content {
+      padding: 100px 20px 60px;
+    }
+
+    .hero__headline {
+      font-size: 40px;
+      letter-spacing: 2px;
+    }
+
+    .hero__subtext p {
+      font-size: 14px;
+    }
+
+    .hero__button {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+</style>

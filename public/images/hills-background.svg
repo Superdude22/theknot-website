@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600" preserveAspectRatio="xMidYMax slice">
+  <!-- Sky gradient -->
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0F4FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sky background -->
+  <rect width="1920" height="600" fill="url(#skyGradient)"/>
+
+  <!-- Clouds -->
+  <g fill="#FFFFFF">
+    <!-- Large cloud left -->
+    <ellipse cx="200" cy="150" rx="80" ry="50"/>
+    <ellipse cx="260" cy="140" rx="60" ry="40"/>
+    <ellipse cx="150" cy="160" rx="50" ry="35"/>
+
+    <!-- Large cloud center-right -->
+    <ellipse cx="1100" cy="180" rx="100" ry="60"/>
+    <ellipse cx="1180" cy="170" rx="70" ry="45"/>
+    <ellipse cx="1030" cy="190" rx="60" ry="40"/>
+
+    <!-- Small cloud right -->
+    <ellipse cx="1500" cy="120" rx="50" ry="30"/>
+    <ellipse cx="1540" cy="115" rx="35" ry="25"/>
+  </g>
+
+  <!-- Back hills (lighter green) -->
+  <path d="M0 450 Q200 350 400 420 Q600 490 800 400 Q1000 310 1200 380 Q1400 450 1600 370 Q1800 290 1920 350 L1920 600 L0 600 Z" fill="#8BC34A"/>
+
+  <!-- Middle hills (medium green) -->
+  <path d="M0 500 Q150 420 350 480 Q550 540 750 460 Q950 380 1150 450 Q1350 520 1550 440 Q1750 360 1920 420 L1920 600 L0 600 Z" fill="#7CB342"/>
+
+  <!-- Front hills (darker green) -->
+  <path d="M0 550 Q250 480 500 530 Q750 580 1000 510 Q1250 440 1500 500 Q1750 560 1920 500 L1920 600 L0 600 Z" fill="#558B2F"/>
+
+  <!-- Small climber silhouette on hill -->
+  <g transform="translate(380, 435)" fill="#333">
+    <circle cx="0" cy="-12" r="3"/>
+    <path d="M0 -9 L0 0 M-3 -5 L3 -5 M0 0 L-2 8 M0 0 L2 8"/>
+  </g>
+</svg>

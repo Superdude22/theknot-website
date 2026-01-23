@@ -1,0 +1,354 @@
+{
+  "project": "theknot-astro-phase2",
+  "branchName": "theknot-astro-pages",
+  "description": "Migrate remaining 7 pages from Next.js to Astro + Keystatic",
+  "workspaceRoot": "c:/World/TheKnot/astro-site",
+  "referenceDocuments": [
+    "HANDOFF.md",
+    "../website/src/app/about/page.tsx",
+    "../website/src/app/membership/page.tsx",
+    "../website/src/app/new-climber/page.tsx",
+    "../website/src/app/amenities/page.tsx",
+    "../website/src/app/events/page.tsx",
+    "../website/src/app/shop/page.tsx",
+    "../website/src/app/classes/page.tsx"
+  ],
+  "rules": [
+    "Use Astro components (.astro) for static content, React islands (.tsx) for interactive elements",
+    "Import brand colors from Keystatic via CSS variables (var(--color-*))",
+    "Use BaseLayout.astro as the wrapper for all pages",
+    "Copy content directly from existing Next.js pages - do not invent new content",
+    "Maintain mobile responsiveness matching the Next.js implementation",
+    "Use fonts.heading for headlines, fonts.body for body text (via CSS classes)",
+    "Keep styled-jsx patterns converted to Astro's <style> blocks",
+    "Run 'npm run dev' to verify page renders without errors"
+  ],
+  "userStories": [
+    {
+      "id": "KNOT-010",
+      "title": "Migrate About page",
+      "description": "Create src/pages/about.astro with hero, core values accordion, team sections, and FAQ accordion",
+      "acceptanceCriteria": [
+        "Create src/pages/about.astro",
+        "Hero section with building facade background image and 'ABOUT & FAQ' headline",
+        "Core Values accordion section (5 items: Consciously Aware, Radically Bold, Impact Driven, Remain Authentic, Get Stoked Stay Stoked)",
+        "Team sections: Owners & Managers, Coordinators, Desk Staff & Instructors",
+        "TeamMemberCard component with blue-black/grayscale filters",
+        "FAQ accordion section (6 items with feedback buttons)",
+        "Mobile responsive layout",
+        "Page returns 200 at http://127.0.0.1:4321/about"
+      ],
+      "priority": 1,
+      "passes": true,
+      "taskSize": "large",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/about.astro", "src/components/TeamMemberCard.astro"],
+      "notes": "Team data is hardcoded in the page. Images at /images/canva-final/team-*.jpg"
+    },
+    {
+      "id": "KNOT-011",
+      "title": "Migrate Membership page",
+      "description": "Create src/pages/membership.astro with video hero, pricing, policies accordion, benefits, and local discounts",
+      "acceptanceCriteria": [
+        "Create src/pages/membership.astro",
+        "Hero section with video background (membership-hero.mp4)",
+        "REDPOINT MEMBER PORTAL button linking to portal",
+        "Pricing section with facility photo and $80/month pricing",
+        "Policies accordion (Billing, Freeze, Cancellations, Kids, Youth memberships)",
+        "Member Benefits list with checkmark icons",
+        "Local Discounts section with 15% and 10% tiers",
+        "Google Maps embed for location",
+        "Mobile responsive layout",
+        "Page returns 200 at http://127.0.0.1:4321/membership"
+      ],
+      "priority": 2,
+      "passes": true,
+      "taskSize": "large",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/membership.astro"],
+      "notes": "Local business data is hardcoded. Modal for business details uses React island."
+    },
+    {
+      "id": "KNOT-012",
+      "title": "Migrate New Climbers page",
+      "description": "Create src/pages/new-climber.astro with video hero, day pass pricing, activities cards, and safety accordions",
+      "acceptanceCriteria": [
+        "Create src/pages/new-climber.astro",
+        "Hero section with video background (newclimbers-hero.mp4)",
+        "Welcome section with climbing shoes image",
+        "Day pass section with $25 pricing and facility photo",
+        "Activities ThreeCardSection (Intro Class, Private Belayer, Schedule)",
+        "Safety & Etiquette accordion (Climb at Own Risk, Etiquette, Route Grades, Kids Policies, Code of Conduct)",
+        "Mobile responsive layout",
+        "Page returns 200 at http://127.0.0.1:4321/new-climber"
+      ],
+      "priority": 3,
+      "passes": true,
+      "taskSize": "medium",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/new-climber.astro"],
+      "notes": "Reuse existing ThreeCardSection and Accordion components."
+    },
+    {
+      "id": "KNOT-013",
+      "title": "Migrate Amenities page",
+      "description": "Create src/pages/amenities.astro with hero, amenity cards grid, and gym tour video section",
+      "acceptanceCriteria": [
+        "Create src/pages/amenities.astro",
+        "Hero section with design slide background",
+        "MORE THAN JUST CLIMBING heading",
+        "6 amenity cards in 2 rows (Bouldering, Top-Rope, Yoga, Gear Rental, Belay Classes, Training Area)",
+        "CTA buttons for Class Schedule and Belay Classes",
+        "Gym tour video placeholder section",
+        "Mobile responsive (single column on mobile)",
+        "Page returns 200 at http://127.0.0.1:4321/amenities"
+      ],
+      "priority": 4,
+      "passes": true,
+      "taskSize": "medium",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/amenities.astro", "src/components/AmenityCard.astro"],
+      "notes": "Amenity cards have placeholder sky/hills SVG backgrounds with labels."
+    },
+    {
+      "id": "KNOT-014",
+      "title": "Migrate Events listing page",
+      "description": "Create src/pages/events/index.astro with hero, featured event, event grid, and activity accordions",
+      "acceptanceCriteria": [
+        "Create src/pages/events/index.astro",
+        "Hero section with design slide background",
+        "Featured event section with registration button",
+        "Event grid with 5 placeholder events (EVENT 1-5)",
+        "Event types accordion (Bouldering Only, Top Rope + Bouldering, Staff Belay, Yoga, Belay Class, Kids)",
+        "Event request form buttons",
+        "Up ENDing Parkinsons section",
+        "Register Here CTA",
+        "Mobile responsive layout",
+        "Page returns 200 at http://127.0.0.1:4321/events"
+      ],
+      "priority": 5,
+      "passes": true,
+      "taskSize": "medium",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/events/index.astro"],
+      "notes": "Event card click opens modal (React island) for small events."
+    },
+    {
+      "id": "KNOT-015",
+      "title": "Migrate Event detail page template",
+      "description": "Create src/pages/events/[slug].astro for large event detail pages",
+      "acceptanceCriteria": [
+        "Create src/pages/events/[slug].astro",
+        "Dynamic route that reads from content/events collection",
+        "Event hero with title and date",
+        "Event description and details",
+        "Registration button if hasRegistration",
+        "Location/address display",
+        "Fallback 404 for unknown slugs",
+        "Page returns 200 for valid event slugs"
+      ],
+      "priority": 6,
+      "passes": true,
+      "taskSize": "small",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/events/[slug].astro"],
+      "notes": "Uses Astro's getStaticPaths for static generation from Keystatic content."
+    },
+    {
+      "id": "KNOT-016",
+      "title": "Migrate Shop page",
+      "description": "Create src/pages/shop.astro with hero, category navigation, and product grids",
+      "acceptanceCriteria": [
+        "Create src/pages/shop.astro",
+        "Hero section with sky/hills SVG background",
+        "Gear store button linking to portal",
+        "Category navigation (Apparel, Essentials, Top-Rope Gear, Climbing Shoes)",
+        "Product grid for each category (placeholder products)",
+        "Product card click opens modal with size/color selectors",
+        "Mobile responsive (2-column grid on mobile)",
+        "Page returns 200 at http://127.0.0.1:4321/shop"
+      ],
+      "priority": 7,
+      "passes": true,
+      "taskSize": "large",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/shop.astro", "src/components/ProductCard.astro"],
+      "notes": "Product data hardcoded. Modal is React island with state for size/color."
+    },
+    {
+      "id": "KNOT-017",
+      "title": "Migrate Classes page",
+      "description": "Create src/pages/classes.astro with hero, schedule, class types accordion, and pricing",
+      "acceptanceCriteria": [
+        "Create src/pages/classes.astro",
+        "Hero section with events design slide background",
+        "LEARN & GROW intro section",
+        "Weekly schedule grid (Mon-Sun)",
+        "Class types accordion (Intro, Belay Cert, Top-Rope Technique, Bouldering, Yoga, Strength)",
+        "Private lessons pricing cards ($60 single, $200 package)",
+        "READY TO START CTA section with buttons",
+        "Mobile responsive layout",
+        "Page returns 200 at http://127.0.0.1:4321/classes"
+      ],
+      "priority": 8,
+      "passes": true,
+      "taskSize": "medium",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/pages/classes.astro"],
+      "notes": "Schedule and class data hardcoded. Accordion reused from components."
+    },
+    {
+      "id": "KNOT-020",
+      "title": "Create team member Keystatic content",
+      "description": "Extract team member data from About page into content/team/*.json files",
+      "acceptanceCriteria": [
+        "Create content/team/mike-palmer.json with name, title, image, order, isLeadership",
+        "Create content/team/mitch-eadens.json",
+        "Create content/team/tulsa-curtis.json",
+        "Create content/team/ashley-marcone.json",
+        "Create content/team/zach-landry.json",
+        "Create coordinator entries (ash, claudia, rick, amanda, natalie)",
+        "Create desk staff entries (g, ben, andrew, steve, carley, talia, sarah, shane, yan, aaron)",
+        "All entries follow schema in keystatic.config.ts",
+        "Team appears correctly on /keystatic admin"
+      ],
+      "priority": 9,
+      "passes": true,
+      "taskSize": "medium",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/content/team/*.json"],
+      "notes": "20 total team members to create. Use kebab-case filenames."
+    },
+    {
+      "id": "KNOT-021",
+      "title": "Create policies Keystatic content",
+      "description": "Extract FAQ/policies from About and Membership pages into content/policies/*.json",
+      "acceptanceCriteria": [
+        "Create content/policies/day-passes.json",
+        "Create content/policies/membership-includes.json",
+        "Create content/policies/billing.json",
+        "Create content/policies/experience-required.json",
+        "Create content/policies/hours.json",
+        "Create content/policies/feedback.json",
+        "Create content/policies/kids.json",
+        "Create content/policies/youth-memberships.json",
+        "All entries follow schema in keystatic.config.ts",
+        "Policies appear correctly on /keystatic admin"
+      ],
+      "priority": 10,
+      "passes": true,
+      "taskSize": "small",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/content/policies/*.json"],
+      "notes": "Copy exact content from existing Next.js pages."
+    },
+    {
+      "id": "KNOT-022",
+      "title": "Create sample event entries",
+      "description": "Create 5 sample event entries in content/events/*.json",
+      "acceptanceCriteria": [
+        "Create content/events/event-1.json with title, date, time, description, address",
+        "Create content/events/event-2.json",
+        "Create content/events/event-3.json",
+        "Create content/events/event-4.json",
+        "Create content/events/event-5.json",
+        "Include hasRegistration and registrationUrl fields",
+        "All entries follow schema in keystatic.config.ts",
+        "Events appear correctly on /keystatic admin"
+      ],
+      "priority": 11,
+      "passes": true,
+      "taskSize": "small",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/content/events/*.json"],
+      "notes": "Use placeholder content matching existing Next.js events."
+    },
+    {
+      "id": "KNOT-023",
+      "title": "Update navigation links",
+      "description": "Update Header component to link to all new pages",
+      "acceptanceCriteria": [
+        "Header nav links point to /about, /membership, /new-climber, /amenities, /events, /shop, /classes",
+        "Mobile menu links updated similarly",
+        "All navigation links work correctly",
+        "Active state styling applies to current page"
+      ],
+      "priority": 12,
+      "passes": true,
+      "taskSize": "small",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/components/Header.astro", "src/components/HeaderMobile.tsx"],
+      "notes": "Header already exists, just needs correct href values."
+    },
+    {
+      "id": "KNOT-024",
+      "title": "Add Modal component for Events and Shop",
+      "description": "Create reusable Modal React component for event details and product views",
+      "acceptanceCriteria": [
+        "Create src/components/Modal.tsx",
+        "Support single and two-column layouts",
+        "Support light and dark themes",
+        "Close button and click-outside-to-close",
+        "Accessible: focus trap, escape key closes",
+        "Works with both Events and Shop pages"
+      ],
+      "priority": 13,
+      "passes": true,
+      "taskSize": "medium",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": ["src/components/Modal.tsx"],
+      "notes": "Port from existing website/src/components/Modal.tsx"
+    },
+    {
+      "id": "KNOT-025",
+      "title": "Final integration test",
+      "description": "Run dev server and verify all pages render correctly",
+      "acceptanceCriteria": [
+        "npm run dev starts without errors",
+        "http://127.0.0.1:4321/ renders home page",
+        "http://127.0.0.1:4321/about renders About page",
+        "http://127.0.0.1:4321/membership renders Membership page",
+        "http://127.0.0.1:4321/new-climber renders New Climber page",
+        "http://127.0.0.1:4321/amenities renders Amenities page",
+        "http://127.0.0.1:4321/events renders Events page",
+        "http://127.0.0.1:4321/shop renders Shop page",
+        "http://127.0.0.1:4321/classes renders Classes page",
+        "http://127.0.0.1:4321/keystatic admin UI works",
+        "No console errors in browser",
+        "All navigation links work"
+      ],
+      "priority": 14,
+      "passes": true,
+      "taskSize": "small",
+      "model": "claude-sonnet-4-5-20250514",
+      "primaryFiles": [],
+      "notes": "Final verification before closing Phase 2."
+    }
+  ],
+  "phases": {
+    "phase1": {
+      "name": "Core Pages",
+      "stories": ["KNOT-010", "KNOT-011", "KNOT-012"],
+      "status": "pending",
+      "notes": "About, Membership, New Climbers - high priority pages"
+    },
+    "phase2": {
+      "name": "Secondary Pages",
+      "stories": ["KNOT-013", "KNOT-014", "KNOT-015", "KNOT-016", "KNOT-017"],
+      "status": "pending",
+      "notes": "Amenities, Events, Shop, Classes"
+    },
+    "phase3": {
+      "name": "Content & Components",
+      "stories": ["KNOT-020", "KNOT-021", "KNOT-022", "KNOT-023", "KNOT-024"],
+      "status": "pending",
+      "notes": "Keystatic content and shared components"
+    },
+    "phase4": {
+      "name": "Integration",
+      "stories": ["KNOT-025"],
+      "status": "pending",
+      "notes": "Final testing and verification"
+    }
+  }
+}

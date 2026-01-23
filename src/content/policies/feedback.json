@@ -1,0 +1,24 @@
+{
+  "title": "How Do I Give Feedback?",
+  "content": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "Enjoyed the gym or think something could be improved? Let us know your thoughts!"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "Have other questions? Send us an email instead at info@climbtheknot.com"
+        }
+      ]
+    }
+  ],
+  "buttonText": "SUBMIT FEEDBACK",
+  "buttonLink": "https://forms.gle/feedback",
+  "order": 6
+}

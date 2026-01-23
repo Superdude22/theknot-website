@@ -1,0 +1,197 @@
+---
+interface Card {
+  label: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  image?: string;
+}
+
+interface Props {
+  title: string;
+  cards: Card[];
+}
+
+const { title, cards } = Astro.props;
+
+// Placeholder SVG patterns for cards without images
+const placeholderColors = [
+  { bg: 'var(--color-rust)', accent: 'var(--color-coral)' },
+  { bg: 'var(--color-manatee)', accent: 'var(--color-surf)' },
+  { bg: 'var(--color-limestone)', accent: 'var(--color-milkweed)' },
+];
+---
+
+<section class="three-card-section">
+  <h2 class="three-card-section__title">{title}</h2>
+
+  <div class="three-card-section__grid">
+    {cards.map((card, index) => (
+      <div class="card">
+        <div class="card__image-container">
+          {card.image ? (
+            <img
+              src={card.image}
+              alt={card.label}
+              class="card__image"
+              loading="lazy"
+            />
+          ) : (
+            <div
+              class="card__placeholder"
+              style={`background: linear-gradient(135deg, ${placeholderColors[index % 3].bg}, ${placeholderColors[index % 3].accent})`}
+            >
+              <svg
+                viewBox="0 0 100 100"
+                class="card__placeholder-icon"
+                aria-hidden="true"
+              >
+                <circle cx="50" cy="35" r="20" fill="rgba(255,255,255,0.3)" />
+                <path
+                  d="M30 80 L50 50 L70 80 Z"
+                  fill="rgba(255,255,255,0.2)"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <div class="card__content">
+          <h3 class="card__label">{card.label}</h3>
+          <p class="card__description">{card.description}</p>
+          <a
+            href={card.buttonLink}
+            class="btn-secondary card__button"
+            target={card.buttonLink.startsWith('http') ? '_blank' : undefined}
+            rel={card.buttonLink.startsWith('http') ? 'noopener noreferrer' : undefined}
+          >
+            {card.buttonText}
+          </a>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .three-card-section {
+    padding: 0 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .three-card-section__title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 48px 0;
+    letter-spacing: 1px;
+  }
+
+  .three-card-section__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .card {
+    background-color: var(--color-graphite);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card__image-container {
+    aspect-ratio: 4/3;
+    overflow: hidden;
+  }
+
+  .card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card__placeholder-icon {
+    width: 60%;
+    height: 60%;
+    opacity: 0.5;
+  }
+
+  .card__content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .card__label {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+    letter-spacing: 0.5px;
+  }
+
+  .card__description {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-sand);
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+    flex: 1;
+  }
+
+  .card__button {
+    align-self: flex-start;
+    padding: 12px 24px;
+    font-size: 12px;
+  }
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .three-card-section__grid {
+      gap: 24px;
+    }
+
+    .card__content {
+      padding: 20px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .three-card-section {
+      padding: 0 20px;
+    }
+
+    .three-card-section__title {
+      font-size: 24px;
+      margin-bottom: 32px;
+    }
+
+    .three-card-section__grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .card__button {
+      align-self: stretch;
+      text-align: center;
+    }
+  }
+</style>

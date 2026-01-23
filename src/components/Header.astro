@@ -1,0 +1,179 @@
+---
+import HeaderMobile from './HeaderMobile.tsx';
+
+interface Props {
+  isHome?: boolean;
+  showAnnouncement?: boolean;
+}
+
+const { isHome = false, showAnnouncement = false } = Astro.props;
+
+const bannerHeight = showAnnouncement ? 55 : 0;
+const logoWidth = isHome ? 429 : 265;
+const logoHeight = isHome ? 89 : 55;
+
+const navItems = [
+  { label: 'ABOUT & FAQ', href: '/about' },
+  { label: 'NEW CLIMBERS', href: '/new-climber' },
+  { label: 'MEMBERSHIP', href: '/membership' },
+  { label: 'CLASSES', href: '/classes', isPopup: true },
+  { label: 'AMENITIES', href: '/amenities' },
+  { label: 'EVENTS', href: '/events' },
+  { label: 'SHOP', href: '/shop' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  class:list={['header', { 'header--home': isHome, 'header--page': !isHome }]}
+  style={`top: ${bannerHeight}px`}
+>
+  <nav class="header__nav">
+    <!-- Mobile Menu (React Island) -->
+    <div class="header__mobile">
+      <HeaderMobile client:load navItems={navItems} isHome={isHome} />
+    </div>
+
+    <!-- Logo -->
+    <a href="/" class="header__logo-link" aria-label="The Knot - Home">
+      <img
+        src="/images/logos/Logo Horizontal 2.png"
+        alt="The Knot Climbing Gym"
+        width={logoWidth}
+        height={logoHeight}
+        class="header__logo"
+      />
+    </a>
+
+    <!-- Desktop Navigation -->
+    <ul class="header__desktop-nav">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={['header__nav-link', { 'header__nav-link--active': currentPath === item.href }]}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 16px 32px;
+    transition: background-color 0.3s ease;
+  }
+
+  .header--home {
+    background-color: transparent;
+  }
+
+  .header--page {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .header__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .header__mobile {
+    display: none;
+  }
+
+  .header__logo-link {
+    display: flex;
+    align-items: center;
+  }
+
+  .header__logo {
+    object-fit: contain;
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+
+  .header__desktop-nav {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header__nav-link {
+    color: black;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .header__nav-link:hover {
+    opacity: 0.7;
+  }
+
+  .header__nav-link--active {
+    color: var(--color-rust);
+  }
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .header__desktop-nav {
+      gap: 20px;
+    }
+
+    .header__nav-link {
+      font-size: 12px;
+    }
+
+    .header__logo {
+      width: 220px;
+      height: 46px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .header {
+      padding: 16px 20px;
+    }
+
+    .header__nav {
+      justify-content: flex-start;
+      gap: 16px;
+    }
+
+    .header__mobile {
+      display: flex;
+      align-items: center;
+      order: 1;
+    }
+
+    .header__logo-link {
+      order: 2;
+    }
+
+    .header__logo {
+      width: 180px;
+      height: 37px;
+    }
+
+    .header__desktop-nav {
+      display: none;
+    }
+  }
+</style>

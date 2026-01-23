@@ -1,0 +1,16 @@
+{
+  "title": "What Are Your Hours?",
+  "content": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "We're open Monday through Friday from 6am to 10pm, Saturday from 8am to 8pm, and Sunday from 9am to 6pm. Holiday hours may vary, so check our social media or call ahead on major holidays."
+        }
+      ]
+    }
+  ],
+  "buttonText": "",
+  "buttonLink": "",
+  "order": 5
+}

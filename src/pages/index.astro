@@ -1,0 +1,327 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/HeroSection.astro';
+import ThreeCardSection from '../components/ThreeCardSection.astro';
+import Accordion from '../components/Accordion.tsx';
+
+// Default home page content (will be replaced by Keystatic content)
+const heroContent = {
+  headline: 'CLIMB. TRAIN. LEARN.',
+  subtext: [
+    "Built by climbers, The Knot is Gainesville's hub for the climbing community.",
+    "Want to pick up a new exciting hobby that can take you on adventures around the world? Want to stay in shape through a fun, community-focused sport? Whatever your climbing goals, we've got you covered with a variety of climbing surfaces, training equipment, classes, on-site gear store, and yoga."
+  ],
+  buttonText: 'START CLIMBING',
+  buttonLink: '/new-climber',
+};
+
+const membershipContent = {
+  headline: 'START YOUR MEMBERSHIP TODAY FOR',
+  promoPrice: '$XX',
+  monthlyRate: 'Then $80/month, billed on the first of every month.',
+  description: 'Only pay for the remaining days of this month, then cancel anytime with no contract or additional fees.',
+  buttonText: 'JOIN NOW',
+  buttonLink: 'https://portal.climbtheknot.com/gnv/memberships/join',
+};
+
+const notReadyCards = [
+  {
+    label: 'Day Passes',
+    description: 'Try it out just for the day! Available Mon - Fri from 10am - 3pm',
+    buttonText: 'MORE INFO',
+    buttonLink: '/new-climber#day-passes',
+  },
+  {
+    label: 'Private Belayer',
+    description: 'Hire a staff member to hold the ropes for you! Available by appointment only.',
+    buttonText: 'SCHEDULE',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/services/private-belayer',
+  },
+  {
+    label: 'Intro to Climbing',
+    description: 'Learn the basics to get started with bouldering. Sign up for our next class!',
+    buttonText: 'REGISTRATION',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/services/intro-class',
+  },
+];
+
+const policies = [
+  {
+    title: 'BILLING & PAYMENTS',
+    content: `Payments & billing changes processed on the 1st of each month.\n\nSubmit all change requests by the 25th to ensure they'll be processed before billing.`,
+    buttonText: 'UPDATE BILLING',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/account/billing',
+  },
+  {
+    title: 'MEMBERSHIP FREEZE',
+    content: `Freeze for $8/month (Minimum 1 month).\n\nLocks in your rate - even if we change pricing!\n\nEasy restart - just pay the prorated amount & resume billing.`,
+    buttonText: 'FREEZE YOUR MEMBERSHIP',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
+  },
+  {
+    title: 'CANCELLATIONS',
+    content: `Cancel anytime - Cancellations go into effect prior to billing on the first of the following month.\n\nPlanning on returning? Check out our Freeze option instead to come back on the Prorated amount.`,
+    buttonText: 'TERMINATE YOUR MEMBERSHIP',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
+  },
+  {
+    title: 'KIDS POLICIES',
+    content: `We're excited to welcome kids and youth climbers into our space. To keep the gym safe and fun for everyone, we have a few important policies in place:\n\n• Children under 5 are not permitted to climb in our facility.\n• Children 12 and under must be actively supervised by an adult at all times. We follow a 1:1 adult-to-child ratio.\n• For youth ages 13–15, we require at least one adult for every four climbers (4:1 ratio).\n\nIMPORTANT: The gym can get crowded during peak hours. We recommend that climbers 12 and under plan to finish their sessions before 6 PM on busy evenings.`,
+    buttonText: 'KIDS POLICIES',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/policies/kids',
+  },
+  {
+    title: 'YOUTH MEMBERSHIPS',
+    content: `Kids & Youth memberships must be attached to a full-price adult membership ($80/month) and do not receive full member benefits.\n\n• Kids Membership (Ages 5 - 12): $25/month\n• Youth Membership (Ages 13 - 17): $45/month`,
+    buttonText: 'MEMBERSHIP PAGE',
+    buttonLink: '/membership#benefits',
+  },
+];
+
+const codeOfConduct = {
+  headline: 'CODE OF CONDUCT',
+  paragraphs: [
+    'At The Knot Climbing Gym, we are committed to providing a welcoming, inclusive, and safe environment for all of our climbers and staff. We believe that everyone deserves to feel respected and valued while enjoying their time in our facility.',
+    "As such, we have a zero-tolerance policy for any form of harassment, discrimination, violence, suggestion of violence, hate speech, or any other unwanted behavior that makes others feel uncomfortable. This policy may (at management's sole discretion) be applied to behavior both inside and outside The Knot Climbing Gym.",
+  ],
+};
+---
+
+<BaseLayout title="Home" isHome={true}>
+  <!-- Hero Section -->
+  <HeroSection
+    headline={heroContent.headline}
+    subtext={heroContent.subtext}
+    buttonText={heroContent.buttonText}
+    buttonLink={heroContent.buttonLink}
+  />
+
+  <!-- Secondary Navigation would go here -->
+
+  <!-- Membership Pricing Section -->
+  <section class="membership-section">
+    <h2 class="membership-headline">
+      {membershipContent.headline}<br />
+      <span class="price-highlight">{membershipContent.promoPrice}</span>
+    </h2>
+
+    <div class="pricing-container">
+      <div class="pricing-image">
+        <img
+          src="/images/canva-final/home-hero-bg.jpg"
+          alt="Climber reaching for hold at The Knot"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="pricing-info">
+        <p class="pricing-note">{membershipContent.monthlyRate}</p>
+        <p class="pricing-subtext">{membershipContent.description}</p>
+        <a
+          href={membershipContent.buttonLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-secondary join-button"
+        >
+          {membershipContent.buttonText}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rates & Policies Accordion -->
+  <section class="policies-section">
+    <h2 class="policies-heading">RATES & POLICIES</h2>
+    <Accordion client:visible items={policies} />
+  </section>
+
+  <!-- Not Ready to Commit Section -->
+  <section class="not-ready-section">
+    <ThreeCardSection
+      title="NOT READY TO COMMIT? NO PROBLEM!"
+      cards={notReadyCards}
+    />
+  </section>
+
+  <!-- Code of Conduct Section -->
+  <section class="coc-section">
+    <h2 class="coc-heading">{codeOfConduct.headline}</h2>
+    {codeOfConduct.paragraphs.map((paragraph) => (
+      <p class="coc-text">{paragraph}</p>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  /* Membership Section */
+  .membership-section {
+    padding: 48px;
+    background-color: black;
+  }
+
+  .membership-headline {
+    font-family: var(--font-heading);
+    font-size: 42px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0 0 48px 0;
+    line-height: 1.2;
+  }
+
+  .price-highlight {
+    color: var(--color-manatee);
+  }
+
+  .pricing-container {
+    display: flex;
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  .pricing-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pricing-image img {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .pricing-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+    text-align: right;
+  }
+
+  .pricing-note {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: white;
+    margin: 0;
+  }
+
+  .pricing-subtext {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-sand);
+    margin: 0;
+    max-width: 400px;
+  }
+
+  .join-button {
+    width: 100%;
+    max-width: 400px;
+    min-height: 55px;
+    margin-top: 16px;
+  }
+
+  /* Policies Section */
+  .policies-section {
+    padding: 24px 48px 64px;
+    background-color: black;
+  }
+
+  .policies-heading {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    margin: 0 0 24px 0;
+    letter-spacing: 1px;
+  }
+
+  /* Not Ready Section */
+  .not-ready-section {
+    padding: 80px 0;
+    background-color: black;
+  }
+
+  /* Code of Conduct Section */
+  .coc-section {
+    padding: 48px;
+    background-color: black;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .coc-heading {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    margin: 0 0 24px 0;
+    letter-spacing: 1px;
+  }
+
+  .coc-text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: white;
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+
+  .coc-text:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .membership-section {
+      padding: 48px 24px;
+    }
+
+    .membership-headline {
+      font-size: 28px;
+    }
+
+    .pricing-container {
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .pricing-info {
+      align-items: center;
+      text-align: center;
+    }
+
+    .pricing-subtext {
+      max-width: 100%;
+    }
+
+    .join-button {
+      max-width: 100%;
+    }
+
+    .policies-section {
+      padding: 24px 16px 48px;
+    }
+
+    .policies-heading {
+      font-size: 24px;
+    }
+
+    .not-ready-section {
+      padding: 48px 0;
+    }
+
+    .coc-section {
+      padding: 32px 24px;
+    }
+  }
+</style>

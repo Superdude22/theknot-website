@@ -1,0 +1,16 @@
+{
+  "title": "Do You Offer Day Passes?",
+  "content": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "Yes! We offer day passes for $25 which includes access to all climbing areas, yoga classes, and the training area. Rental gear is available for an additional fee. Day passes are a great way to try out the gym before committing to a membership."
+        }
+      ]
+    }
+  ],
+  "buttonText": "",
+  "buttonLink": "",
+  "order": 1
+}

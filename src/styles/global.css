@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font Face Declarations */
+@font-face {
+  font-family: 'Zing Rust';
+  src: url('/fonts/Zing Rust Base (Demo).otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uniform Pro';
+  src: url('/fonts/Uniform Pro fonts/Fonts/Uniform-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uniform Pro';
+  src: url('/fonts/Uniform Pro fonts/Fonts/Uniform-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uniform Pro';
+  src: url('/fonts/Uniform Pro fonts/Fonts/Uniform-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uniform Pro';
+  src: url('/fonts/Uniform Pro fonts/Fonts/Uniform-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uniform Pro';
+  src: url('/fonts/Uniform Pro fonts/Fonts/Uniform-Ultra.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('/fonts/RUBIK.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('/fonts/RUBIK ITALIC.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Default CSS Variables (can be overridden by Keystatic brand settings) */
+:root {
+  /* Brand Colors */
+  --color-rust: #B94237;
+  --color-limestone: #D0D96F;
+  --color-manatee: #84BABF;
+  --color-coral: #D89B92;
+  --color-surf: #0B4F6C;
+  --color-deep-water: #073447;
+  --color-milkweed: #F2F3AE;
+  --color-graphite: #39393B;
+  --color-sand: #FAF9F5;
+
+  /* Fonts */
+  --font-display: 'Zing Rust', 'Uniform Pro', sans-serif;
+  --font-heading: 'Uniform Pro', sans-serif;
+  --font-body: 'Rubik', 'Uniform Pro', sans-serif;
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #000000;
+  color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+}
+
+/* Utility Classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Button Base Styles */
+.btn-primary {
+  @apply inline-flex items-center justify-center px-10 py-4
+         bg-tkcg-rust text-white font-heading font-bold
+         uppercase tracking-wider text-sm
+         transition-opacity duration-200 hover:opacity-90;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center px-10 py-4
+         bg-tkcg-manatee text-black font-heading font-bold
+         uppercase tracking-wider text-sm
+         transition-opacity duration-200 hover:opacity-90;
+}

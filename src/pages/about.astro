@@ -1,0 +1,410 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TeamMemberCard from '../components/TeamMemberCard.astro';
+import Accordion from '../components/Accordion.tsx';
+
+const ownersManagers = [
+  { name: 'MIKE PALMER', title: 'Owner / CEO', image: '/images/canva-final/team-mike-palmer.jpg' },
+  { name: 'MITCH EADENS', title: 'Owner / COO', image: '/images/canva-final/team-mitch-eadens.jpg' },
+  { name: 'TULSA CURTIS', title: 'Operations Manager', image: '/images/canva-final/team-tulsa-curtis.jpg' },
+  { name: 'ASHLEY MARCONE', title: 'Head Setter', image: '/images/canva-final/team-ashley-marcone.jpg' },
+  { name: 'ZACH LANDRY', title: 'Risk Mgmt & Tech Mgr', image: '/images/canva-final/team-zach-landry.jpg' },
+];
+
+const coordinators = [
+  { name: 'ASH', title: 'Coordinator', image: '/images/canva-final/staff-ash.jpg' },
+  { name: 'CLAUDIA', title: 'Coordinator', image: '/images/canva-final/staff-claudia.jpg' },
+  { name: 'RICK', title: 'Coordinator', image: '/images/canva-final/staff-rick.jpg' },
+  { name: 'AMANDA', title: 'Coordinator', image: '/images/canva-final/staff-amanda.jpg' },
+  { name: 'NATALIE', title: 'Coordinator', image: '/images/canva-final/staff-natalie.jpg' },
+];
+
+const deskStaff = [
+  { name: 'G', title: 'Staff', image: '/images/canva-final/staff-g.jpg' },
+  { name: 'BEN', title: 'Staff', image: '/images/canva-final/staff-ben.jpg' },
+  { name: 'ANDREW', title: 'Staff', image: '/images/canva-final/staff-andrew.jpg' },
+  { name: 'STEVE', title: 'Staff', image: '/images/canva-final/staff-steve.jpg' },
+  { name: 'CARLEY', title: 'Staff', image: '/images/canva-final/staff-carley.jpg' },
+  { name: 'TALIA', title: 'Staff', image: '/images/canva-final/staff-talia.jpg' },
+  { name: 'SARAH', title: 'Staff', image: '/images/canva-final/staff-sarah.jpg' },
+  { name: 'SHANE', title: 'Staff', image: '/images/canva-final/staff-shane.jpg' },
+  { name: 'YAN', title: 'Staff', image: '/images/canva-final/staff-yan.jpg' },
+  { name: 'AARON', title: 'Staff', image: '/images/canva-final/staff-aaron.png' },
+];
+
+const coreValuesItems = [
+  {
+    title: 'CONSCIOUSLY AWARE',
+    content: 'We are mindful of our impact on the environment, our community, and each other. Every decision we make considers the broader implications for the climbing community and the world around us.',
+  },
+  {
+    title: 'RADICALLY BOLD',
+    content: 'We push boundaries and encourage climbers to step outside their comfort zones. Growth happens when we challenge ourselves and embrace the unknown.',
+  },
+  {
+    title: 'IMPACT DRIVEN',
+    content: 'Everything we do is focused on making a positive difference. From supporting local climbing initiatives to fostering an inclusive community, we measure success by the impact we create.',
+  },
+  {
+    title: 'REMAIN AUTHENTIC',
+    content: 'We stay true to who we are and what we believe in. Authenticity builds trust, and trust builds community. We are genuine in our interactions and transparent in our operations.',
+  },
+  {
+    title: 'GET STOKED, STAY STOKED',
+    content: 'Climbing is fun! We maintain enthusiasm and passion for what we do, and we share that energy with everyone who walks through our doors. Stoke is contagious.',
+  },
+];
+
+const faqItems = [
+  {
+    title: 'DO YOU OFFER DAY PASSES?',
+    content: 'Yes! We offer day passes for $25 which includes access to all climbing areas, yoga classes, and the training area. Rental gear is available for an additional fee. Day passes are a great way to try out the gym before committing to a membership.',
+  },
+  {
+    title: "WHAT'S INCLUDED WITH MY MEMBERSHIP?",
+    content: 'Your membership includes unlimited access to all climbing areas (bouldering and top-rope), yoga classes, the training area, and gear rentals. Members also receive discounts at local partner businesses and priority registration for events and classes.',
+  },
+  {
+    title: 'HOW DOES BILLING WORK?',
+    content: 'Memberships are billed monthly on your sign-up date. When you join, you only pay for the remaining days in your first month, then $80/month thereafter. You can manage your billing, freeze your membership, or cancel anytime through the member portal.',
+  },
+  {
+    title: 'DO I NEED CLIMBING EXPERIENCE?',
+    content: 'Not at all! We welcome climbers of all experience levels, from complete beginners to seasoned pros. Our Intro to Climbing classes are perfect for first-timers and cover all the basics including safety, techniques, and gym etiquette. Our staff is always available to help you get started.',
+  },
+  {
+    title: 'WHAT ARE YOUR HOURS?',
+    content: "We're open Monday through Friday from 6am to 10pm, Saturday from 8am to 8pm, and Sunday from 9am to 6pm. Holiday hours may vary, so check our social media or call ahead on major holidays.",
+  },
+  {
+    title: 'HOW DO I GIVE FEEDBACK?',
+    content: 'Enjoyed the gym or think something could be improved? Let us know your thoughts! Have other questions? Send us an email instead at info@climbtheknot.com',
+    buttonText: 'SUBMIT FEEDBACK',
+    buttonLink: 'https://forms.gle/feedback',
+  },
+];
+---
+
+<BaseLayout title="About & FAQ">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="hero-overlay"></div>
+      <img
+        src="/images/canva-final/about-building-facade.jpg"
+        alt="The Knot Climbing Gym building exterior"
+        class="hero-image"
+      />
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-headline">
+        ABOUT & <a href="#faq" class="faq-link">FAQ</a>
+      </h1>
+    </div>
+  </section>
+
+  <!-- Core Values Section -->
+  <section class="core-values-section">
+    <h2 class="section-heading">CORE VALUES</h2>
+    <div class="accordion-container">
+      <Accordion client:visible items={coreValuesItems} />
+    </div>
+  </section>
+
+  <!-- Owners & Managers Section -->
+  <section class="team-section owners-section">
+    <h2 class="team-section-heading">OWNERS & MANAGERS</h2>
+    <div class="team-grid owners-grid">
+      {ownersManagers.map((member) => (
+        <TeamMemberCard
+          name={member.name}
+          title={member.title}
+          image={member.image}
+          filterType="blue-black"
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- Coordinators Section -->
+  <section class="team-section coordinators-section">
+    <h2 class="team-section-heading">COORDINATORS</h2>
+    <div class="team-grid coordinators-grid">
+      {coordinators.map((member) => (
+        <TeamMemberCard
+          name={member.name}
+          title={member.title}
+          image={member.image}
+          filterType="grayscale"
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- Desk Staff & Instructors Section -->
+  <section class="team-section staff-section">
+    <h2 class="team-section-heading staff-heading">DESK STAFF & INSTRUCTORS</h2>
+    <div class="team-grid staff-grid">
+      {deskStaff.map((member) => (
+        <TeamMemberCard
+          name={member.name}
+          title={member.title}
+          image={member.image}
+          filterType="grayscale"
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-section">
+    <h2 class="section-heading">FREQUENTLY ASKED QUESTIONS</h2>
+    <div class="accordion-container">
+      <Accordion client:visible items={faqItems} />
+    </div>
+    <div class="feedback-buttons">
+      <a 
+        href="https://forms.gle/feedback" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="feedback-button submit-btn"
+      >
+        SUBMIT FEEDBACK
+      </a>
+      <a 
+        href="mailto:info@climbtheknot.com" 
+        class="feedback-button contact-btn"
+      >
+        CONTACT US
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-section {
+    position: relative;
+    min-height: 60vh;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(200, 150, 0, 0.6);
+    z-index: 1;
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 48px;
+    padding-top: 120px;
+  }
+
+  .hero-headline {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 72px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin: 0;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  .faq-link {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .faq-link:hover {
+    text-decoration: underline;
+  }
+
+  .core-values-section {
+    padding: 64px 24px;
+    background-color: #000;
+  }
+
+  .section-heading {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 40px 0;
+    letter-spacing: 2px;
+  }
+
+  .accordion-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .team-section {
+    padding: 64px 24px;
+    background-color: #fff;
+  }
+
+  .owners-section {
+    padding-top: 80px;
+  }
+
+  .team-section-heading {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--color-coral, #D89B92);
+    text-transform: uppercase;
+    margin: 0 0 40px 0;
+    letter-spacing: 2px;
+  }
+
+  .staff-heading {
+    text-align: left;
+  }
+
+  .team-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .owners-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .coordinators-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .staff-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 16px;
+  }
+
+  .faq-section {
+    padding: 64px 24px;
+    background-color: #000;
+  }
+
+  .feedback-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .feedback-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 225px;
+    height: 55px;
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .feedback-button:hover {
+    opacity: 0.9;
+  }
+
+  .submit-btn {
+    background-color: var(--color-manatee, #84BABF);
+    color: #000;
+  }
+
+  .contact-btn {
+    background-color: var(--color-manatee, #84BABF);
+    color: #000;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      min-height: 50vh;
+    }
+
+    .hero-content {
+      padding: 24px;
+      padding-top: 100px;
+    }
+
+    .hero-headline {
+      font-size: 42px;
+    }
+
+    .core-values-section {
+      padding: 48px 16px;
+    }
+
+    .section-heading {
+      font-size: 24px;
+      margin-bottom: 32px;
+    }
+
+    .team-section {
+      padding: 48px 16px;
+    }
+
+    .team-section-heading {
+      font-size: 20px;
+      margin-bottom: 32px;
+    }
+
+    .team-grid {
+      gap: 16px;
+    }
+
+    .staff-grid {
+      gap: 12px;
+    }
+
+    .faq-section {
+      padding: 48px 16px;
+    }
+
+    .feedback-buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .feedback-button {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+</style>

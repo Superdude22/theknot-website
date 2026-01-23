@@ -1,0 +1,178 @@
+{
+  "downloadedAt": "2026-01-22T02:40:55.312Z",
+  "outputDir": "c:\\World\\TheKnot\\website\\public\\images\\canva-final",
+  "images": [
+    {
+      "filename": "a4c31ffe882e5ae95ffc87a7bbbc3907.png",
+      "saveas": "logo.png",
+      "section": "header"
+    },
+    {
+      "filename": "79f83df9aeda720b6e48d7ddf8044c87.jpg",
+      "saveas": "home-hero-bg.jpg",
+      "section": "home-hero"
+    },
+    {
+      "filename": "25101fcc7c6d0a52edfb19a952a98d4f.jpg",
+      "saveas": "home-membership-cta.jpg",
+      "section": "home-membership"
+    },
+    {
+      "filename": "5aa69992668983e9d293c66b1a68429d.jpg",
+      "saveas": "home-card-day-passes.jpg",
+      "section": "home-cards"
+    },
+    {
+      "filename": "d045f9da6ef7771ae92dad538d3e9e54.jpg",
+      "saveas": "home-card-private-belayer.jpg",
+      "section": "home-cards"
+    },
+    {
+      "filename": "eabd6dafed4dac07f439a9f6fce4242e.png",
+      "saveas": "home-card-intro-climbing.png",
+      "section": "home-cards"
+    },
+    {
+      "filename": "355bf3968d4417c281bd85466902a0f8.jpg",
+      "saveas": "about-building-facade.jpg",
+      "section": "about-hero"
+    },
+    {
+      "filename": "0782867ae818a75f8b85d90df4ba01b5.jpg",
+      "saveas": "team-mike-palmer.jpg",
+      "section": "about-leadership"
+    },
+    {
+      "filename": "7ede9976d0f604680d75ba9cbd152138.jpg",
+      "saveas": "team-mitch-eadens.jpg",
+      "section": "about-leadership"
+    },
+    {
+      "filename": "7ddf4f3ddcb4b64aa6d986fed7018bc8.jpg",
+      "saveas": "team-tulsa-curtis.jpg",
+      "section": "about-leadership"
+    },
+    {
+      "filename": "c952be2d96e3ba95e211397b0e0a9913.jpg",
+      "saveas": "team-ashley-marcone.jpg",
+      "section": "about-leadership"
+    },
+    {
+      "filename": "1ee51a2d5ee188b49396c25126d036e6.jpg",
+      "saveas": "team-zach-landry.jpg",
+      "section": "about-leadership"
+    },
+    {
+      "filename": "cfa313ca7a1824206d89436ea9f036f5.jpg",
+      "saveas": "staff-ash.jpg",
+      "section": "about-coordinators"
+    },
+    {
+      "filename": "11c5325e56b7f09b0bf4f8266576d3b0.jpg",
+      "saveas": "staff-claudia.jpg",
+      "section": "about-coordinators"
+    },
+    {
+      "filename": "07987a1084c75365752013fc05023abd.jpg",
+      "saveas": "staff-rick.jpg",
+      "section": "about-coordinators"
+    },
+    {
+      "filename": "7549e6a62ca1e98718ab517d68da9106.jpg",
+      "saveas": "staff-amanda.jpg",
+      "section": "about-coordinators"
+    },
+    {
+      "filename": "d9c70bf275bca3646a5989cfc7f38d1e.jpg",
+      "saveas": "staff-natalie.jpg",
+      "section": "about-coordinators"
+    },
+    {
+      "filename": "a393e38d5de955420e40afdfab71540d.jpg",
+      "saveas": "staff-g.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "204b477acac00a8d33aac6b5e03e9f47.jpg",
+      "saveas": "staff-ben.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "0671eb2f1164407072cad9ebca536224.jpg",
+      "saveas": "staff-andrew.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "f344de56630b97b04754cfdbb760337e.jpg",
+      "saveas": "staff-steve.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "32f70a8f8fc823b890d5d5b12b48336b.jpg",
+      "saveas": "staff-carley.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "4340501f344f99728d18a8939860bd7f.jpg",
+      "saveas": "staff-talia.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "0a35b3c34f1291945bbe40a3b5fd03f8.jpg",
+      "saveas": "staff-sarah.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "d3ba8bef57c86128c5859545e1953ed0.jpg",
+      "saveas": "staff-shane.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "15efc43d51dcbaca2014d9c9e72b34c2.jpg",
+      "saveas": "staff-yan.jpg",
+      "section": "about-staff"
+    },
+    {
+      "filename": "68cf1a48c5e2dfa4432bf669f1a05509.png",
+      "saveas": "staff-aaron.png",
+      "section": "about-staff"
+    },
+    {
+      "filename": "87e22a62965f141aa08e93699b0b3527.jpg",
+      "saveas": "newclimbers-shoes.jpg",
+      "section": "new-climbers-welcome"
+    },
+    {
+      "filename": "39b8dbe908acfc54fa75fbbbed96993d.png",
+      "saveas": "newclimbers-facility-staff.png",
+      "section": "new-climbers-facility"
+    },
+    {
+      "filename": "7a73830eefe04a1592d351624f5428d9.jpg",
+      "saveas": "membership-wall-gear.jpg",
+      "section": "membership-manage"
+    },
+    {
+      "filename": "5ba22998664e6de9767c0fd0dd6b9ee9.jpg",
+      "saveas": "membership-climber-benefits.jpg",
+      "section": "membership-benefits"
+    }
+  ],
+  "videos": [
+    {
+      "filename": "fad1ceee31bb1ec4a14cb632db9d888b.mp4",
+      "saveas": "newclimbers-hero.mp4",
+      "section": "new-climbers-hero"
+    },
+    {
+      "filename": "a68e720b37e416fe96d5993339da8fb0.mp4",
+      "saveas": "membership-hero.mp4",
+      "section": "membership-hero"
+    }
+  ],
+  "stats": {
+    "success": 33,
+    "failed": 0,
+    "total": 33
+  }
+}

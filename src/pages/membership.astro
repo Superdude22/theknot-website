@@ -1,0 +1,727 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Accordion from '../components/Accordion.tsx';
+
+interface LocalBusiness {
+  name: string;
+  discount: number;
+  instagram: string;
+  description: string;
+  address: string;
+  hours: string;
+}
+
+const localBusinesses: LocalBusiness[] = [
+  { name: 'AFTERNOON CAFE', discount: 15, instagram: '@afternoongville', description: 'Local cafe serving specialty coffee and fresh pastries. Show your Knot membership card for 15% off your order.', address: '123 Main St, Gainesville, FL', hours: 'Mon-Sat 7am-5pm' },
+  { name: 'FRENCHMEN STREET FOOD', discount: 15, instagram: '@frenchmenstreetfood', description: 'Authentic Southern-inspired street food. Members receive 15% off all orders.', address: '456 University Ave, Gainesville, FL', hours: 'Tue-Sun 11am-9pm' },
+  { name: 'LLOYD CLARK SPORTS', discount: 15, instagram: '@lloydclarksports', description: 'Your local outdoor gear shop. 15% off climbing gear and apparel for Knot members.', address: '789 NW 13th St, Gainesville, FL', hours: 'Mon-Sat 10am-7pm, Sun 12-5pm' },
+  { name: 'AFTERNOON RESTAURANT', discount: 10, instagram: '@afternoonrestaurant', description: 'Farm-to-table dining experience. 10% off for Knot members.', address: '321 SW 2nd Ave, Gainesville, FL', hours: 'Daily 11am-10pm' },
+  { name: 'HUMBLE WOOD FIRE', discount: 10, instagram: '@humblewoodfire', description: 'Artisan wood-fired pizza and fresh baked bagels. 10% member discount.', address: '555 W University Ave, Gainesville, FL', hours: 'Daily 7am-10pm' },
+  { name: "CRY BABY'S", discount: 10, instagram: '@crybabysgville', description: 'Craft cocktails and Southern comfort food. 10% off for Knot members.', address: '17 SW 1st Ave, Gainesville, FL', hours: 'Wed-Sun 5pm-12am' },
+  { name: "BABY J'S", discount: 10, instagram: '@babyjsgainesville', description: 'BBQ and craft beer in downtown Gainesville. 10% member discount on food.', address: '15 SW 1st Ave, Gainesville, FL', hours: 'Daily 11am-11pm' },
+  { name: 'COMING SOON', discount: 0, instagram: '', description: 'New local partner coming soon! Check back for updates.', address: 'Gainesville, FL', hours: 'TBD' },
+];
+
+const benefits = [
+  { title: 'FREE GEAR RENTALS', description: '(for you & your guests)' },
+  { title: 'ONE FREE MONTHLY GUEST PASS', description: '(additional $15 each, up to 3 guests)' },
+  { title: 'FREE BELAY CLASS + CERTIFICATION', description: '' },
+  { title: 'FREE YOGA + FITNESS CLASSES', description: '' },
+  { title: 'UNLIMITED CLIMBING DURING BUSINESS HOURS', description: '' },
+  { title: '20% OFF ALL PRODUCTS IN OUR GEAR SHOP', description: '' },
+  { title: 'MEMBER KEY TAG FOR SPECIAL DISCOUNTS AT LOCAL BUSINESSES', description: '' },
+];
+
+const policyItems = [
+  {
+    title: 'BILLING & PAYMENTS',
+    content: 'Payments & billing changes processed on the 1st of each month.\nSubmit all change requests by the 25th to ensure they\'ll be processed before billing.',
+    buttonText: 'UPDATE BILLING',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/account/billing',
+  },
+  {
+    title: 'MEMBERSHIP FREEZE',
+    content: 'Freeze for $8/month (Minimum 1 month).\nLocks in your rate - even if we change pricing!\nEasy restart - just pay the prorated amount & resume billing.',
+    buttonText: 'FREEZE YOUR MEMBERSHIP',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
+  },
+  {
+    title: 'CANCELLATIONS',
+    content: 'Cancel anytime - Cancellations go into effect prior to billing on the first of the following month.\nPlanning on returning? Check out our Freeze option instead to come back on the Prorated amount.',
+    buttonText: 'TERMINATE YOUR MEMBERSHIP',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
+  },
+  {
+    title: 'KIDS POLICIES',
+    content: 'We\'re excited to welcome kids and youth climbers into our space. To keep the gym safe and fun for everyone, we have a few important policies in place:\n• Children under 5 are not permitted to climb in our facility.\n• Children 12 and under must be actively supervised by an adult at all times. We follow a 1:1 adult-to-child ratio—each child needs their own supervising adult.\n• For youth ages 13–15, we require at least one adult for every four climbers (4:1 ratio).\n\nIMPORTANT NOTE: The gym can get crowded during peak hours, which makes it tougher for younger kids to climb safely. For that reason, we recommend that climbers 12 and under plan to finish their sessions before 6 PM on busy evenings.\n\nFor more info on our kids policies, check out our full list here:',
+    buttonText: 'KIDS POLICIES',
+    buttonLink: 'https://portal.climbtheknot.com/gnv/policies/kids',
+  },
+  {
+    title: 'YOUTH MEMBERSHIPS',
+    content: 'Kids & Youth memberships must be attached to a full-price adult membership ($80/month) and do not receive full member benefits. Check out our membership page for more info on benefits and registration.\n• Kids Membership (Ages 5 - 12): $25/month\n• Youth Membership (Ages 13 - 17): $45/month\n  - Minors 16 and older have the option to sign up for an Adult Membership or a Youth Membership. Take a look at the benefits on our member page.',
+    buttonText: 'MEMBERSHIP PAGE',
+    buttonLink: '/membership#benefits',
+  },
+];
+
+const fifteenPercentBusinesses = localBusinesses.filter(b => b.discount === 15);
+const tenPercentBusinesses = localBusinesses.filter(b => b.discount === 10);
+const comingSoonBusinesses = localBusinesses.filter(b => b.discount === 0);
+---
+
+<BaseLayout title="Membership">
+  <!-- Hero Section with Video -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        class="hero-video"
+      >
+        <source src="/images/canva-final/membership-hero.mp4" type="video/mp4" />
+      </video>
+      <img
+        src="/images/membership/hero-design-slide.png"
+        alt="Membership hero background"
+        class="hero-fallback"
+      />
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-headline">MEMBERSHIP</h1>
+    </div>
+  </section>
+
+  <!-- REDPOINT MEMBER PORTAL Button Section -->
+  <section class="portal-section">
+    <a
+      href="https://portal.climbtheknot.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="portal-button"
+    >
+      REDPOINT MEMBER PORTAL
+    </a>
+  </section>
+
+  <!-- Pricing and JOIN NOW Section -->
+  <section class="pricing-section">
+    <div class="pricing-container">
+      <div class="pricing-image">
+        <img
+          src="/images/canva-final/membership-wall-gear.jpg"
+          alt="Climbing wall with gear and holds"
+        />
+      </div>
+      <div class="pricing-info">
+        <h2 class="pricing-heading">
+          START YOUR MEMBERSHIP TODAY FOR <span class="price-highlight">$XX</span>
+        </h2>
+        <p class="price-monthly">$80/month</p>
+        <p class="pricing-note">Cancel anytime</p>
+        <a
+          href="https://portal.climbtheknot.com/gnv/memberships/join"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="join-button"
+        >
+          JOIN NOW
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rates & Policies Accordion Section -->
+  <section class="policies-section">
+    <Accordion client:visible items={policyItems} />
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section" id="benefits">
+    <div class="benefits-container">
+      <div class="benefits-list">
+        <h2 class="benefits-heading">MEMBER BENEFITS</h2>
+        <ul class="benefits-items">
+          {benefits.map((benefit) => (
+            <li class="benefit-item">
+              <div class="benefit-check">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="11" stroke="var(--color-manatee, #84BABF)" stroke-width="2" fill="none" />
+                  <path d="M7 12l3 3 7-7" stroke="var(--color-manatee, #84BABF)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div class="benefit-text">
+                <span class="benefit-title">{benefit.title}</span>
+                {benefit.description && <span class="benefit-description">{benefit.description}</span>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="benefits-image">
+        <img
+          src="/images/canva-final/membership-climber-benefits.jpg"
+          alt="Climber enjoying membership benefits"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Local Discounts Section -->
+  <section class="discounts-section">
+    <h2 class="discounts-heading">LOCAL DISCOUNTS</h2>
+    
+    <!-- 15% Tier -->
+    <div class="discount-tier">
+      <h3 class="tier-label">15%</h3>
+      <div class="business-grid">
+        {fifteenPercentBusinesses.map((business) => (
+          <button
+            class="business-card"
+            data-business={JSON.stringify(business)}
+          >
+            <div class="business-image">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                <rect x="10" y="20" width="40" height="30" rx="2" fill="rgba(255,255,255,0.3)" />
+                <rect x="20" y="10" width="20" height="15" rx="2" fill="rgba(255,255,255,0.2)" />
+              </svg>
+            </div>
+            <span class="business-name">{business.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- 10% Tier -->
+    <div class="discount-tier">
+      <h3 class="tier-label">10%</h3>
+      <div class="business-grid">
+        {tenPercentBusinesses.map((business) => (
+          <button
+            class="business-card"
+            data-business={JSON.stringify(business)}
+          >
+            <div class="business-image">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                <rect x="10" y="20" width="40" height="30" rx="2" fill="rgba(255,255,255,0.3)" />
+                <rect x="20" y="10" width="20" height="15" rx="2" fill="rgba(255,255,255,0.2)" />
+              </svg>
+            </div>
+            <span class="business-name">{business.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Coming Soon -->
+    <div class="discount-tier">
+      <h3 class="tier-label-text">MORE PARTNERS</h3>
+      <div class="business-grid">
+        {comingSoonBusinesses.map((business) => (
+          <button class="business-card coming-soon">
+            <div class="business-image">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                <circle cx="30" cy="30" r="20" fill="rgba(255,255,255,0.2)" />
+                <text x="30" y="35" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="24">?</text>
+              </svg>
+            </div>
+            <span class="business-name">{business.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Google Maps Section -->
+  <section class="map-section">
+    <div class="map-container">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.8977682371455!2d-82.32682892351847!3d29.64639753753234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e8a30d1f4a8b5b%3A0x8e4f9d5b5b5b5b5b!2s704%20S%20Main%20St%2C%20Gainesville%2C%20FL%2032601!5e0!3m2!1sen!2sus!4v1704931200000!5m2!1sen!2sus"
+        width="100%"
+        height="450"
+        style="border: 0;"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="The Knot - Climbing Gym Location"
+      ></iframe>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-section {
+    position: relative;
+    min-height: 70vh;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  .hero-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+    z-index: 0;
+  }
+
+  .hero-content {
+    position: absolute;
+    right: 48px;
+    bottom: 15%;
+    z-index: 2;
+  }
+
+  .hero-headline {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 72px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin: 0;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .portal-section {
+    display: flex;
+    justify-content: flex-end;
+    padding: 40px 48px;
+    background-color: #000;
+  }
+
+  .portal-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    background-color: var(--color-rust, #B94237);
+    color: #fff;
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .portal-button:hover {
+    opacity: 0.9;
+  }
+
+  .pricing-section {
+    padding: 64px 48px;
+    background-color: #fff;
+  }
+
+  .pricing-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .pricing-image img {
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .pricing-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .pricing-heading {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 28px;
+    font-weight: 900;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .price-highlight {
+    color: var(--color-rust, #B94237);
+  }
+
+  .price-monthly {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 24px;
+    font-weight: 900;
+    color: #000;
+    margin: 0;
+  }
+
+  .pricing-note {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+  }
+
+  .join-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    background-color: var(--color-rust, #B94237);
+    color: #fff;
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    margin-top: 8px;
+  }
+
+  .join-button:hover {
+    opacity: 0.9;
+  }
+
+  .policies-section {
+    padding: 48px 24px 64px;
+    background-color: #000;
+  }
+
+  .policies-section :global(.accordion) {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .benefits-section {
+    padding: 64px 48px;
+    background-color: var(--color-sand, #FAF9F5);
+  }
+
+  .benefits-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .benefits-list {
+    flex: 1;
+    padding: 32px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .benefits-heading {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 28px;
+    font-weight: 900;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0 0 24px 0;
+    letter-spacing: 1px;
+  }
+
+  .benefits-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .benefit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .benefit-check {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .benefit-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .benefit-title {
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+  }
+
+  .benefit-description {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 12px;
+    color: #666;
+  }
+
+  .benefits-image img {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    filter: sepia(50%);
+  }
+
+  .discounts-section {
+    padding: 64px 48px;
+    background-color: #000;
+  }
+
+  .discounts-heading {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 48px 0;
+    letter-spacing: 2px;
+  }
+
+  .discount-tier {
+    margin-bottom: 48px;
+  }
+
+  .tier-label {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--color-limestone, #D0D96F);
+    text-align: center;
+    margin: 0 0 24px 0;
+  }
+
+  .tier-label-text {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--color-limestone, #D0D96F);
+    text-align: center;
+    margin: 0 0 24px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .business-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .business-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 150px;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .business-card:hover {
+    transform: scale(1.05);
+  }
+
+  .business-card.coming-soon {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .business-image {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: grayscale(100%);
+  }
+
+  .business-name {
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  .map-section {
+    padding: 0;
+    background-color: #000;
+  }
+
+  .map-container {
+    width: 100%;
+    border: 4px solid #000;
+    line-height: 0;
+  }
+
+  .map-container iframe {
+    display: block;
+    width: 100%;
+    min-height: 400px;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      min-height: 50vh;
+    }
+
+    .hero-content {
+      right: 24px;
+      bottom: 10%;
+    }
+
+    .hero-headline {
+      font-size: 42px;
+    }
+
+    .portal-section {
+      padding: 32px 16px;
+      justify-content: center;
+    }
+
+    .portal-button {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px 24px;
+    }
+
+    .pricing-section {
+      padding: 48px 24px;
+    }
+
+    .pricing-container {
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .pricing-image img {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .pricing-info {
+      align-items: center;
+      text-align: center;
+    }
+
+    .pricing-heading {
+      font-size: 24px;
+    }
+
+    .price-monthly {
+      font-size: 22px;
+    }
+
+    .join-button {
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .policies-section {
+      padding: 24px 16px 48px;
+    }
+
+    .benefits-section {
+      padding: 48px 24px;
+    }
+
+    .benefits-container {
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .benefits-list {
+      padding: 24px;
+    }
+
+    .benefits-heading {
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .benefits-image img {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      aspect-ratio: 4/3;
+    }
+
+    .discounts-section {
+      padding: 48px 24px;
+    }
+
+    .discounts-heading {
+      font-size: 24px;
+    }
+
+    .tier-label {
+      font-size: 48px;
+    }
+
+    .business-card {
+      width: 130px;
+    }
+
+    .business-image {
+      width: 100px;
+      height: 100px;
+    }
+
+    .business-name {
+      font-size: 11px;
+    }
+  }
+</style>

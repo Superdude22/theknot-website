@@ -1,0 +1,718 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface AmenityCard {
+  title: string;
+  description: string;
+  imageLabel: string;
+  labelPosition: 'left' | 'center' | 'right';
+}
+
+const amenitiesRow1: AmenityCard[] = [
+  {
+    title: 'BOULDERING',
+    description: '5,000+ square feet of bouldering walls with a variety of angles and routes for all skill levels',
+    imageLabel: 'Pic of bouldering',
+    labelPosition: 'left',
+  },
+  {
+    title: 'TOP-ROPE',
+    description: '17 anchors with 30+ routes – belay certification or staff belayer required',
+    imageLabel: 'Pic of staff belay/top-roping',
+    labelPosition: 'center',
+  },
+  {
+    title: 'YOGA & FITNESS CLASSES',
+    description: 'Free yoga and fitness classes included with membership – check the schedule for class times',
+    imageLabel: 'Pic of yoga class',
+    labelPosition: 'right',
+  },
+];
+
+const amenitiesRow2: AmenityCard[] = [
+  {
+    title: 'FREE GEAR RENTAL',
+    description: 'Climbing shoes, harnesses, and chalk bags available at no extra cost for members',
+    imageLabel: 'Rental gear pic',
+    labelPosition: 'left',
+  },
+  {
+    title: 'FREE BELAY CLASSES',
+    description: 'Learn to belay with our certified instructors – training included with membership',
+    imageLabel: 'Belay class pic',
+    labelPosition: 'center',
+  },
+  {
+    title: 'EXTENSIVE TRAINING AREA & ON-SITE SHOWERS',
+    description: 'Dedicated training equipment, hangboards, campus boards, and clean shower facilities',
+    imageLabel: 'Training area pic',
+    labelPosition: 'right',
+  },
+];
+---
+
+<BaseLayout title="Amenities">
+  <!-- Hero Section with design slide background -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img
+        src="/images/amenities/hero-design-slide.png"
+        alt="Amenities hero background"
+      />
+    </div>
+
+    <div class="hero-content">
+      <h1 class="hero-headline">AMENITIES</h1>
+    </div>
+
+    <!-- Video placeholder in top right -->
+    <div class="hero-video-placeholder">
+      <div class="video-box">
+        <span class="video-label">Video of gym tour</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- More Than Just Climbing Section -->
+  <section class="amenities-grid-section">
+    <h2 class="section-heading">MORE THAN JUST CLIMBING</h2>
+
+    <!-- Row 1 -->
+    <div class="amenities-grid">
+      {amenitiesRow1.map((amenity) => (
+        <div class="amenity-card">
+          <div class="card-image">
+            <div class="placeholder-bg">
+              <div class="placeholder-sky"></div>
+              <div class="placeholder-clouds">
+                <div class="cloud cloud-left"></div>
+                <div class="cloud cloud-right"></div>
+              </div>
+              <div class="placeholder-hills">
+                <div class="hill hill-back"></div>
+                <div class="hill hill-front"></div>
+              </div>
+            </div>
+            <div class={`card-label label-${amenity.labelPosition}`}>
+              <span>{amenity.imageLabel}</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{amenity.title}</h3>
+            <p class="card-description">{amenity.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Row 2 -->
+    <div class="amenities-grid row-2">
+      {amenitiesRow2.map((amenity) => (
+        <div class="amenity-card">
+          <div class="card-image">
+            <div class="placeholder-bg">
+              <div class="placeholder-sky"></div>
+              <div class="placeholder-clouds">
+                <div class="cloud cloud-left"></div>
+                <div class="cloud cloud-right"></div>
+              </div>
+              <div class="placeholder-hills">
+                <div class="hill hill-back"></div>
+                <div class="hill hill-front"></div>
+              </div>
+            </div>
+            <div class={`card-label label-${amenity.labelPosition}`}>
+              <span>{amenity.imageLabel}</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{amenity.title}</h3>
+            <p class="card-description">{amenity.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="cta-row">
+      <a
+        href="https://portal.climbtheknot.com/gnv/calendar"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-button"
+      >
+        CLASS SCHEDULE
+      </a>
+      <a
+        href="https://portal.climbtheknot.com/gnv/services/belay-class"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-button"
+      >
+        BELAY CLASSES
+      </a>
+    </div>
+  </section>
+
+  <!-- Gym Tour Video Section -->
+  <section class="gym-tour-section">
+    <div class="tour-video-container">
+      <div class="tour-placeholder">
+        <div class="placeholder-sky"></div>
+        <div class="placeholder-clouds">
+          <div class="cloud cloud-1"></div>
+          <div class="cloud cloud-2"></div>
+          <div class="cloud cloud-3"></div>
+        </div>
+        <div class="placeholder-hills">
+          <div class="hill hill-back"></div>
+          <div class="hill hill-front"></div>
+        </div>
+      </div>
+      <div class="tour-label">
+        <svg
+          width="40"
+          height="30"
+          viewBox="0 0 40 30"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <polygon points="15,7 28,15 15,23" fill="white" />
+        </svg>
+        <span>Gym tour overview video</span>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .hero-section {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .hero-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+  }
+
+  .hero-content {
+    position: absolute;
+    bottom: 30px;
+    right: 5%;
+    z-index: 10;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 2px;
+  }
+
+  .hero-video-placeholder {
+    position: absolute;
+    top: 60px;
+    right: 40px;
+    z-index: 10;
+  }
+
+  .video-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-rust);
+    padding: 16px 20px;
+    border: 3px solid black;
+    min-width: 120px;
+  }
+
+  .video-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: white;
+    text-align: center;
+  }
+
+  /* Section Heading */
+  .section-heading {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 900;
+    color: black;
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0 0 40px 0;
+  }
+
+  /* Amenities Grid Section */
+  .amenities-grid-section {
+    padding: 60px 5%;
+    background: white;
+  }
+
+  .amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    margin: 0 auto 24px;
+  }
+
+  .row-2 {
+    margin-bottom: 40px;
+  }
+
+  /* Amenity Card */
+  .amenity-card {
+    position: relative;
+  }
+
+  .card-image {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border: 3px solid black;
+  }
+
+  .placeholder-bg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
+  }
+
+  .placeholder-sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
+  }
+
+  .placeholder-clouds {
+    position: absolute;
+    top: 15%;
+    left: 0;
+    right: 0;
+    height: 30%;
+  }
+
+  .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .cloud::before,
+  .cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .cloud-left {
+    width: 50px;
+    height: 20px;
+    top: 20%;
+    left: 15%;
+  }
+
+  .cloud-left::before {
+    width: 25px;
+    height: 25px;
+    top: -12px;
+    left: 8px;
+  }
+
+  .cloud-left::after {
+    width: 30px;
+    height: 30px;
+    top: -15px;
+    left: 20px;
+  }
+
+  .cloud-right {
+    width: 60px;
+    height: 25px;
+    top: 30%;
+    right: 20%;
+  }
+
+  .cloud-right::before {
+    width: 30px;
+    height: 30px;
+    top: -15px;
+    left: 10px;
+  }
+
+  .cloud-right::after {
+    width: 35px;
+    height: 35px;
+    top: -18px;
+    left: 25px;
+  }
+
+  .placeholder-hills {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+  }
+
+  .hill {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50% 50% 0 0;
+  }
+
+  .hill-back {
+    width: 120%;
+    height: 80%;
+    left: -10%;
+    background: #8FB339;
+  }
+
+  .hill-front {
+    width: 100%;
+    height: 60%;
+    left: 10%;
+    background: #5C8A2B;
+  }
+
+  .card-label {
+    position: absolute;
+    bottom: 12px;
+    background: var(--color-rust);
+    padding: 8px 16px;
+    border: 3px solid black;
+  }
+
+  .card-label span {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: white;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .label-left {
+    left: 12px;
+  }
+
+  .label-center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .label-right {
+    right: 12px;
+  }
+
+  .card-content {
+    padding: 16px 0;
+  }
+
+  .card-title {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: black;
+    text-transform: uppercase;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+  }
+
+  .card-description {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* CTA Row */
+  .cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .cta-button {
+    display: inline-block;
+    min-width: 180px;
+    padding: 14px 32px;
+    text-align: center;
+    background: var(--color-rust);
+    color: white;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .cta-button:hover {
+    opacity: 0.9;
+  }
+
+  /* Gym Tour Section */
+  .gym-tour-section {
+    padding: 0 5% 60px;
+    background: white;
+  }
+
+  .tour-video-container {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border: 3px solid black;
+  }
+
+  .tour-placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
+  }
+
+  .tour-placeholder .placeholder-sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
+  }
+
+  .tour-placeholder .placeholder-clouds {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    right: 0;
+    height: 40%;
+  }
+
+  .tour-placeholder .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .tour-placeholder .cloud::before,
+  .tour-placeholder .cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .tour-placeholder .cloud-1 {
+    width: 60px;
+    height: 25px;
+    top: 20%;
+    left: 15%;
+  }
+
+  .tour-placeholder .cloud-1::before {
+    width: 30px;
+    height: 30px;
+    top: -15px;
+    left: 10px;
+  }
+
+  .tour-placeholder .cloud-1::after {
+    width: 35px;
+    height: 35px;
+    top: -18px;
+    left: 25px;
+  }
+
+  .tour-placeholder .cloud-2 {
+    width: 50px;
+    height: 20px;
+    top: 30%;
+    left: 45%;
+  }
+
+  .tour-placeholder .cloud-2::before {
+    width: 25px;
+    height: 25px;
+    top: -12px;
+    left: 8px;
+  }
+
+  .tour-placeholder .cloud-2::after {
+    width: 28px;
+    height: 28px;
+    top: -14px;
+    left: 20px;
+  }
+
+  .tour-placeholder .cloud-3 {
+    width: 70px;
+    height: 28px;
+    top: 25%;
+    right: 15%;
+  }
+
+  .tour-placeholder .cloud-3::before {
+    width: 35px;
+    height: 35px;
+    top: -18px;
+    left: 12px;
+  }
+
+  .tour-placeholder .cloud-3::after {
+    width: 40px;
+    height: 40px;
+    top: -20px;
+    left: 30px;
+  }
+
+  .tour-placeholder .placeholder-hills {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+  }
+
+  .tour-placeholder .hill {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50% 50% 0 0;
+  }
+
+  .tour-placeholder .hill-back {
+    width: 120%;
+    height: 85%;
+    left: -10%;
+    background: #8FB339;
+  }
+
+  .tour-placeholder .hill-front {
+    width: 100%;
+    height: 65%;
+    left: 15%;
+    background: #5C8A2B;
+  }
+
+  .tour-label {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-rust);
+    padding: 12px 16px;
+    border: 3px solid black;
+  }
+
+  .tour-label span {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: white;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 220px;
+    }
+
+    .hero-headline {
+      font-size: 36px;
+    }
+
+    .hero-content {
+      bottom: 20px;
+      right: 5%;
+    }
+
+    .hero-video-placeholder {
+      top: 40px;
+      right: 20px;
+    }
+
+    .video-box {
+      padding: 12px 16px;
+      min-width: 100px;
+    }
+
+    .section-heading {
+      font-size: 24px;
+      margin-bottom: 32px;
+    }
+
+    .amenities-grid-section {
+      padding: 40px 5%;
+    }
+
+    .amenities-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .card-label {
+      left: 50% !important;
+      right: auto !important;
+      transform: translateX(-50%);
+    }
+
+    .cta-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cta-button {
+      width: 100%;
+      max-width: 240px;
+    }
+
+    .gym-tour-section {
+      padding: 0 5% 40px;
+    }
+
+    .tour-video-container {
+      aspect-ratio: 16/10;
+    }
+
+    .tour-label {
+      bottom: 10px;
+      right: 10px;
+      padding: 10px 12px;
+    }
+  }
+</style>

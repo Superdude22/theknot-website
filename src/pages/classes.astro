@@ -1,0 +1,455 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ClassesAccordion from '../components/ClassesAccordion.tsx';
+
+const classTypes = [
+  {
+    title: 'INTRO TO CLIMBING',
+    description: 'Perfect for first-timers! Learn the basics of climbing movement, safety, and gym etiquette. Includes a full facility orientation and intro to bouldering.',
+    duration: '1.5 hours',
+    level: 'Beginner',
+    included: false,
+  },
+  {
+    title: 'BELAY CERTIFICATION',
+    description: 'Learn to belay and unlock the full potential of our top-rope walls. Our certified instructors will teach you proper technique, commands, and safety protocols.',
+    duration: '2 hours',
+    level: 'Beginner',
+    included: true,
+  },
+  {
+    title: 'TOP-ROPE TECHNIQUE',
+    description: 'Already certified? Take your skills to the next level with footwork drills, efficient movement patterns, and route reading techniques.',
+    duration: '1.5 hours',
+    level: 'Intermediate',
+    included: true,
+  },
+  {
+    title: 'BOULDERING BASICS',
+    description: 'Discover the art of bouldering with focused technique sessions covering body positioning, problem-solving, and dynamic movement.',
+    duration: '1 hour',
+    level: 'All Levels',
+    included: true,
+  },
+  {
+    title: 'YOGA FOR CLIMBERS',
+    description: 'Improve your flexibility, core strength, and recovery with yoga sessions designed specifically for climbers. Great for injury prevention.',
+    duration: '1 hour',
+    level: 'All Levels',
+    included: true,
+  },
+  {
+    title: 'STRENGTH & CONDITIONING',
+    description: 'Build climbing-specific strength with targeted exercises for grip, core, and pulling power. Sessions include hangboard training and campus work.',
+    duration: '1 hour',
+    level: 'Intermediate/Advanced',
+    included: true,
+  },
+];
+
+const scheduleData = [
+  { day: 'Monday', classes: ['Yoga for Climbers (6 PM)', 'Belay Certification (7 PM)'] },
+  { day: 'Tuesday', classes: ['Bouldering Basics (6 PM)', 'Strength & Conditioning (7:30 PM)'] },
+  { day: 'Wednesday', classes: ['Top-Rope Technique (6 PM)', 'Yoga for Climbers (7:30 PM)'] },
+  { day: 'Thursday', classes: ['Intro to Climbing (6 PM)', 'Belay Certification (7 PM)'] },
+  { day: 'Friday', classes: ['Bouldering Basics (5 PM)'] },
+  { day: 'Saturday', classes: ['Intro to Climbing (10 AM)', 'Belay Certification (1 PM)', 'Yoga for Climbers (3 PM)'] },
+  { day: 'Sunday', classes: ['Open Climb - No Classes'] },
+];
+---
+
+<BaseLayout title="Classes">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img
+        src="/images/events/hero-design-slide.png"
+        alt="Classes hero background"
+      />
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-headline">CLASSES</h1>
+    </div>
+  </section>
+
+  <!-- Intro Section -->
+  <section class="intro-section">
+    <h2 class="section-heading">LEARN & GROW</h2>
+    <p class="intro-text">
+      Whether you're a complete beginner or looking to refine your technique, 
+      The Knot offers classes for every skill level. Most classes are free with 
+      membership – check the schedule and drop in!
+    </p>
+  </section>
+
+  <!-- Class Schedule Section -->
+  <section class="schedule-section">
+    <h2 class="section-heading">WEEKLY SCHEDULE</h2>
+    <div class="schedule-grid">
+      {scheduleData.map((daySchedule) => (
+        <div class="schedule-day">
+          <h3 class="day-name">{daySchedule.day}</h3>
+          <ul class="class-list">
+            {daySchedule.classes.map((classItem) => (
+              <li class="class-item">{classItem}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <p class="schedule-note">
+      * Schedule subject to change. Check our portal for the most up-to-date times.
+    </p>
+  </section>
+
+  <!-- Class Types Section -->
+  <section class="class-types-section">
+    <h2 class="section-heading">CLASS TYPES</h2>
+    <ClassesAccordion items={classTypes} client:load />
+  </section>
+
+  <!-- Private Lessons Section -->
+  <section class="private-section">
+    <h2 class="section-heading">PRIVATE LESSONS</h2>
+    <p class="private-text">
+      Looking for one-on-one instruction? Our experienced coaches offer private 
+      lessons tailored to your specific goals – whether that's conquering your 
+      fear of heights, training for competition, or mastering a specific technique.
+    </p>
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <h3 class="price-title">1-Hour Session</h3>
+        <p class="price-amount">$60</p>
+        <p class="price-note">per person</p>
+      </div>
+      <div class="pricing-card">
+        <h3 class="price-title">4-Session Package</h3>
+        <p class="price-amount">$200</p>
+        <p class="price-note">Save $40!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Registration CTA Section -->
+  <section class="cta-section">
+    <h2 class="cta-heading">READY TO START?</h2>
+    <p class="cta-text">
+      Book a class through our member portal or stop by the front desk.
+    </p>
+    <div class="cta-buttons">
+      <a
+        href="https://portal.climbtheknot.com/gnv/classes"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-button primary"
+      >
+        BOOK A CLASS
+      </a>
+      <a href="/membership" class="cta-button secondary">
+        BECOME A MEMBER
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .hero-section {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: bottom;
+  }
+
+  .hero-content {
+    position: absolute;
+    bottom: 30px;
+    right: 5%;
+    z-index: 2;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display, 'Zing Rust', sans-serif);
+    font-size: 56px;
+    font-weight: 900;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    text-align: right;
+  }
+
+  /* Intro Section */
+  .intro-section {
+    padding: 60px 5%;
+    background: #fff;
+    text-align: center;
+  }
+
+  .section-heading {
+    font-family: var(--font-display, 'Zing Rust', sans-serif);
+    font-size: 32px;
+    font-weight: 900;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0 0 24px 0;
+    letter-spacing: 1px;
+  }
+
+  .intro-text {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 16px;
+    color: #555;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Schedule Section */
+  .schedule-section {
+    padding: 60px 5%;
+    background: var(--color-sand, #FAF9F5);
+    text-align: center;
+  }
+
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    max-width: 1000px;
+    margin: 0 auto 24px;
+  }
+
+  .schedule-day {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+  }
+
+  .day-name {
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-rust, #B94237);
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+    letter-spacing: 1px;
+  }
+
+  .class-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .class-item {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 14px;
+    color: #555;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-sand, #FAF9F5);
+  }
+
+  .class-item:last-child {
+    border-bottom: none;
+  }
+
+  .schedule-note {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Class Types Section */
+  .class-types-section {
+    padding: 60px 5%;
+    background: #fff;
+    text-align: center;
+  }
+
+  .class-types-section .section-heading {
+    margin-bottom: 32px;
+  }
+
+  /* Private Lessons Section */
+  .private-section {
+    padding: 60px 5%;
+    background: var(--color-sand, #FAF9F5);
+    text-align: center;
+  }
+
+  .private-text {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 16px;
+    color: #555;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto 32px;
+  }
+
+  .pricing-cards {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .pricing-card {
+    background: #fff;
+    padding: 32px 40px;
+    border: 3px solid var(--color-rust, #B94237);
+    min-width: 200px;
+  }
+
+  .price-title {
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+  }
+
+  .price-amount {
+    font-family: var(--font-display, 'Zing Rust', sans-serif);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-rust, #B94237);
+    margin: 0;
+  }
+
+  .price-note {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 13px;
+    color: #555;
+    margin: 8px 0 0 0;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    padding: 60px 5%;
+    background: var(--color-rust, #B94237);
+    text-align: center;
+  }
+
+  .cta-heading {
+    font-family: var(--font-display, 'Zing Rust', sans-serif);
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0 0 16px 0;
+  }
+
+  .cta-text {
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 16px;
+    color: #fff;
+    margin: 0 0 32px 0;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-button {
+    display: inline-block;
+    padding: 16px 40px;
+    font-family: var(--font-body, 'Rubik', sans-serif);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 3px solid #000;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .cta-button:hover {
+    opacity: 0.9;
+  }
+
+  .cta-button.primary {
+    background: #fff;
+    color: #000;
+  }
+
+  .cta-button.secondary {
+    background: var(--color-manatee, #84BABF);
+    color: #000;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 220px;
+    }
+
+    .hero-headline {
+      font-size: 42px;
+    }
+
+    .hero-content {
+      bottom: 20px;
+      right: 5%;
+    }
+
+    .section-heading {
+      font-size: 24px;
+    }
+
+    .intro-section,
+    .class-types-section,
+    .private-section,
+    .cta-section {
+      padding: 40px 5%;
+    }
+
+    .schedule-section {
+      padding: 40px 5%;
+    }
+
+    .schedule-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pricing-cards {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pricing-card {
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta-button {
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+    }
+  }
+</style>

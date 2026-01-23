@@ -1,0 +1,412 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const events = await getCollection('events');
+  return events.map((event) => ({
+    params: { slug: event.id },
+    props: { event },
+  }));
+}
+
+const { slug } = Astro.params;
+const { event } = Astro.props;
+
+if (!event) {
+  return Astro.redirect('/404');
+}
+
+const eventData = event.data;
+const eventTitle = eventData.title;
+
+function formatDate(dateString: string | undefined): string {
+  if (!dateString) return 'Date TBD';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+const hasRegistration = !!eventData.registrationLink;
+---
+
+<BaseLayout title={eventTitle}>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      {eventData.image ? (
+        <img src={eventData.image} alt={eventTitle} />
+      ) : (
+        <svg
+          viewBox="0 0 1200 400"
+          preserveAspectRatio="xMidYMid slice"
+          class="placeholder-svg"
+        >
+          <defs>
+            <linearGradient id="eventHeroGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#D6EEF5" />
+              <stop offset="100%" stop-color="#87CEEB" />
+            </linearGradient>
+          </defs>
+          <rect width="1200" height="400" fill="url(#eventHeroGrad)" />
+          <ellipse cx="150" cy="80" rx="80" ry="45" fill="white" opacity="0.9" />
+          <ellipse cx="220" cy="90" rx="60" ry="35" fill="white" opacity="0.9" />
+          <ellipse cx="950" cy="100" rx="100" ry="55" fill="white" opacity="0.9" />
+          <path d="M0 400 Q600 200 1200 400 Z" fill="#8FB339" />
+          <path d="M0 400 Q400 280 800 400 Z" fill="#5C8A2B" />
+        </svg>
+      )}
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-headline">{eventTitle.toUpperCase()}</h1>
+      <p class="hero-date">{formatDate(eventData.date)}</p>
+      {eventData.time && <p class="hero-time">{eventData.time}</p>}
+    </div>
+  </section>
+
+  <!-- Event Details Section -->
+  <section class="details-section">
+    <div class="details-container">
+      <div class="event-description">
+        {eventData.description && (
+          <div class="description-text">
+            <p>{eventData.description}</p>
+          </div>
+        )}
+
+        {eventData.isRecurring && eventData.recurringSchedule && (
+          <div class="recurring-info">
+            <span class="recurring-badge">Recurring Event</span>
+            <p>{eventData.recurringSchedule}</p>
+          </div>
+        )}
+      </div>
+
+      <div class="event-sidebar">
+        <div class="event-info-card">
+          <h3>Event Details</h3>
+          
+          <div class="info-item">
+            <span class="info-label">Date</span>
+            <span class="info-value">{formatDate(eventData.date)}</span>
+          </div>
+
+          {eventData.time && (
+            <div class="info-item">
+              <span class="info-label">Time</span>
+              <span class="info-value">{eventData.time}</span>
+            </div>
+          )}
+
+          <div class="info-item">
+            <span class="info-label">Location</span>
+            <span class="info-value">The Knot Climbing Gym<br />619 S Main St<br />Gainesville, FL 32601</span>
+          </div>
+
+          {hasRegistration && (
+            <a
+              href={eventData.registrationLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="register-button"
+            >
+              REGISTER NOW
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Back to Events -->
+  <section class="back-section">
+    <a href="/events" class="back-link">
+      ← Back to All Events
+    </a>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .hero-section {
+    position: relative;
+    height: 50vh;
+    min-height: 350px;
+    max-height: 500px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+  }
+
+  .hero-background img,
+  .hero-background .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      transparent 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 900px;
+  }
+
+  .hero-headline {
+    font-family: var(--font-heading);
+    font-size: 56px;
+    font-weight: 900;
+    color: white;
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-date {
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 8px 0;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-time {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 400;
+    color: white;
+    margin: 0;
+    opacity: 0.9;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Details Section */
+  .details-section {
+    padding: 60px 5%;
+    background: white;
+  }
+
+  .details-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .event-description {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .description-text p {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--color-graphite);
+    margin: 0;
+  }
+
+  .recurring-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .recurring-badge {
+    display: inline-block;
+    background: var(--color-limestone);
+    color: var(--color-graphite);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .recurring-info p {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--color-graphite);
+    margin: 0;
+  }
+
+  .event-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .event-info-card {
+    background: var(--color-sand);
+    padding: 32px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .event-info-card h3 {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-graphite);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-graphite);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.6;
+  }
+
+  .info-value {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--color-graphite);
+    line-height: 1.5;
+  }
+
+  .register-button {
+    display: block;
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--color-rust);
+    color: white;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    margin-top: 8px;
+  }
+
+  .register-button:hover {
+    opacity: 0.9;
+  }
+
+  /* Back Section */
+  .back-section {
+    padding: 40px 5%;
+    background: white;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-rust);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .back-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 900px) {
+    .details-container {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .event-sidebar {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 45vh;
+      min-height: 300px;
+    }
+
+    .hero-headline {
+      font-size: 36px;
+      letter-spacing: 1px;
+    }
+
+    .hero-date {
+      font-size: 16px;
+    }
+
+    .hero-time {
+      font-size: 14px;
+    }
+
+    .hero-content {
+      padding: 30px 16px;
+    }
+
+    .details-section {
+      padding: 40px 5%;
+    }
+
+    .event-info-card {
+      padding: 24px;
+    }
+
+    .description-text p {
+      font-size: 15px;
+    }
+
+    .back-section {
+      padding: 30px 5%;
+    }
+  }
+</style>

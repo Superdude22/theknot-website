@@ -1,0 +1,16 @@
+{
+  "title": "How Does Billing Work?",
+  "content": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "Memberships are billed monthly on your sign-up date. When you join, you only pay for the remaining days in your first month, then $80/month thereafter. You can manage your billing, freeze your membership, or cancel anytime through the member portal."
+        }
+      ]
+    }
+  ],
+  "buttonText": "UPDATE BILLING",
+  "buttonLink": "https://portal.climbtheknot.com/gnv/account/billing",
+  "order": 3
+}

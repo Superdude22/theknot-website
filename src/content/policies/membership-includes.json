@@ -1,0 +1,16 @@
+{
+  "title": "What's Included With My Membership?",
+  "content": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": "Your membership includes unlimited access to all climbing areas (bouldering and top-rope), yoga classes, the training area, and gear rentals. Members also receive discounts at local partner businesses and priority registration for events and classes."
+        }
+      ]
+    }
+  ],
+  "buttonText": "",
+  "buttonLink": "",
+  "order": 2
+}

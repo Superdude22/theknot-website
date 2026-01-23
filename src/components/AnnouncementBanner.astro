@@ -1,0 +1,81 @@
+---
+interface Props {
+  text: string;
+  linkText?: string;
+  linkUrl?: string;
+  backgroundColor?: 'rust' | 'manatee' | 'limestone' | 'graphite';
+}
+
+const { text, linkText, linkUrl, backgroundColor = 'rust' } = Astro.props;
+
+const bgColorMap = {
+  rust: 'var(--color-rust)',
+  manatee: 'var(--color-manatee)',
+  limestone: 'var(--color-limestone)',
+  graphite: 'var(--color-graphite)',
+};
+
+const textColorMap = {
+  rust: 'white',
+  manatee: 'black',
+  limestone: 'black',
+  graphite: 'white',
+};
+
+const bgColor = bgColorMap[backgroundColor];
+const textColor = textColorMap[backgroundColor];
+---
+
+<div
+  class="announcement-banner"
+  style={`background-color: ${bgColor}; color: ${textColor}`}
+>
+  <p class="announcement-banner__text">
+    {text}
+    {linkText && linkUrl && (
+      <a href={linkUrl} class="announcement-banner__link" style={`color: ${textColor}`}>
+        {linkText}
+      </a>
+    )}
+  </p>
+</div>
+
+<style>
+  .announcement-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+  }
+
+  .announcement-banner__text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+  }
+
+  .announcement-banner__link {
+    margin-left: 8px;
+    text-decoration: underline;
+    font-weight: 700;
+    transition: opacity 0.2s ease;
+  }
+
+  .announcement-banner__link:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .announcement-banner__text {
+      font-size: 12px;
+    }
+  }
+</style>
