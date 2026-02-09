@@ -18,17 +18,33 @@ export default function Accordion({ items }: AccordionProps) {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent, index: number) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleItem(index);
+    }
+  };
+
   return (
     <div className="accordion">
-      {items.map((item, index) => (
+      {items.map((item, index) => {
+        const contentId = `accordion-content-${index}`;
+        const headerId = `accordion-header-${index}`;
+
+        return (
         <div key={index} className="accordion-item">
           <button
+            id={headerId}
             className={`accordion-header ${openIndex === index ? 'accordion-header--open' : ''}`}
             onClick={() => toggleItem(index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
             aria-expanded={openIndex === index}
+            aria-controls={contentId}
+            role="button"
+            tabIndex={0}
           >
             <span className="accordion-title">{item.title}</span>
-            <span className="accordion-icon">
+            <span className="accordion-icon" aria-hidden="true">
               <svg
                 width="24"
                 height="24"
@@ -51,7 +67,10 @@ export default function Accordion({ items }: AccordionProps) {
           </button>
 
           <div
+            id={contentId}
             className="accordion-content"
+            role="region"
+            aria-labelledby={headerId}
             style={{
               maxHeight: openIndex === index ? '1000px' : '0',
               opacity: openIndex === index ? 1 : 0,
@@ -80,7 +99,8 @@ export default function Accordion({ items }: AccordionProps) {
             </div>
           </div>
         </div>
-      ))}
+        );
+      })}
 
       <style>{`
         .accordion {
@@ -91,7 +111,7 @@ export default function Accordion({ items }: AccordionProps) {
 
         .accordion-item {
           border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 4px;
+          border-radius: 0;
           overflow: hidden;
         }
 
@@ -116,12 +136,12 @@ export default function Accordion({ items }: AccordionProps) {
         }
 
         .accordion-title {
-          font-family: var(--font-heading, 'Uniform Pro', sans-serif);
-          font-size: 16px;
+          font-family: var(--font-body, 'Rubik', sans-serif);
+          font-size: 14px;
           font-weight: 700;
           color: white;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 0;
           text-align: left;
         }
 
@@ -139,7 +159,7 @@ export default function Accordion({ items }: AccordionProps) {
 
         .accordion-text {
           font-family: var(--font-body, 'Rubik', sans-serif);
-          font-size: 16px;
+          font-size: 14px;
           color: white;
           line-height: 1.6;
           margin: 0 0 16px;
@@ -157,17 +177,17 @@ export default function Accordion({ items }: AccordionProps) {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 225px;
+          min-width: min(100%, 500px);
           min-height: 55px;
-          padding: 16px 40px;
+          padding: 14px 32px;
           background-color: var(--color-manatee, #84BABF);
           color: black;
-          font-family: var(--font-heading, 'Uniform Pro', sans-serif);
-          font-size: 16px;
+          font-family: var(--font-body, 'Rubik', sans-serif);
+          font-size: 14px;
           font-weight: 700;
           text-transform: uppercase;
           text-decoration: none;
-          letter-spacing: 1px;
+          letter-spacing: 0;
           border: none;
           cursor: pointer;
           transition: opacity 0.2s ease;

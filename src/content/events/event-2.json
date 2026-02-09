@@ -5,5 +5,7 @@
   "description": "Info and stuff about event. What do the people need to know",
   "registrationLink": "https://portal.climbtheknot.com/gnv/events/event-2",
   "isFeatured": false,
-  "isRecurring": false
+  "isRecurring": false,
+  "image": "/images/canva-final/event-2/canva-hills-background.jpg",
+  "imageLibraryPath": "public/images/canva-final/event-2/canva-hills-background.jpg"
 }

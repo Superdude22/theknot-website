@@ -1,5 +1,51 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 
+const CMS_IMAGE_DIRECTORY = 'public/images/canva-final';
+const CMS_IMAGE_PUBLIC_PATH = '/images/canva-final/';
+const CMS_IMAGE_LIBRARY_PATTERN = 'public/images/canva-final/**/*.{jpg,jpeg,png,webp,avif,gif,svg}';
+const CMS_VIDEO_LIBRARY_PATTERN = 'public/images/canva-final/**/*.{mp4,webm,mov,m4v}';
+const CMS_MEDIA_LIBRARY_PATTERN =
+  'public/images/canva-final/**/*.{jpg,jpeg,png,webp,avif,gif,svg,mp4,webm,mov,m4v,pdf}';
+
+const BRAND_COLOR_OPTIONS = [
+  { label: 'Rust (#B94237)', value: '#B94237' },
+  { label: 'Limestone (#D0D96F)', value: '#D0D96F' },
+  { label: 'Manatee (#84BABF)', value: '#84BABF' },
+  { label: 'Coral (#D89B92)', value: '#D89B92' },
+  { label: 'Surf (#0B4F6C)', value: '#0B4F6C' },
+  { label: 'Deep Water (#073447)', value: '#073447' },
+  { label: 'Milkweed (#F2F3AE)', value: '#F2F3AE' },
+  { label: 'Graphite (#39393B)', value: '#39393B' },
+  { label: 'Sand (#FAF9F5)', value: '#FAF9F5' },
+  { label: 'Black (#000000)', value: '#000000' },
+  { label: 'White (#FFFFFF)', value: '#FFFFFF' },
+];
+
+function colorPaletteField(label: string, defaultValue: string, description?: string) {
+  return fields.select({
+    label,
+    options: BRAND_COLOR_OPTIONS,
+    defaultValue,
+    description,
+  });
+}
+
+function imageLibraryField(label: string, description?: string) {
+  return fields.pathReference({
+    label,
+    description,
+    pattern: CMS_IMAGE_LIBRARY_PATTERN,
+  });
+}
+
+function videoLibraryField(label: string, description?: string) {
+  return fields.pathReference({
+    label,
+    description,
+    pattern: CMS_VIDEO_LIBRARY_PATTERN,
+  });
+}
+
 export default config({
   storage:
     process.env.NODE_ENV === 'production'
@@ -22,53 +68,106 @@ export default config({
       schema: {
         colors: fields.object(
           {
-            rust: fields.text({
-              label: 'Rust (Primary)',
-              defaultValue: '#B94237',
-              description: 'Primary brand color - used for primary buttons',
-            }),
-            limestone: fields.text({
-              label: 'Limestone',
-              defaultValue: '#D0D96F',
-              description: 'Bright accent color',
-            }),
-            manatee: fields.text({
-              label: 'Manatee (Secondary)',
-              defaultValue: '#84BABF',
-              description: 'Secondary color - used for secondary buttons',
-            }),
-            coral: fields.text({
-              label: 'Coral',
-              defaultValue: '#D89B92',
-              description: 'Soft accent - Rust at 75%',
-            }),
-            surf: fields.text({
-              label: 'Surf',
-              defaultValue: '#0B4F6C',
-              description: 'Deep blue',
-            }),
-            deepWater: fields.text({
-              label: 'Deep Water',
-              defaultValue: '#073447',
-              description: 'Darkest blue',
-            }),
-            milkweed: fields.text({
-              label: 'Milkweed',
-              defaultValue: '#F2F3AE',
-              description: 'Limestone at 50%',
-            }),
-            graphite: fields.text({
-              label: 'Graphite',
-              defaultValue: '#39393B',
-              description: 'Dark neutral',
-            }),
-            sand: fields.text({
-              label: 'Sand',
-              defaultValue: '#FAF9F5',
-              description: 'Light background',
-            }),
+            rust: colorPaletteField(
+              'Rust (Primary)',
+              '#B94237',
+              'Primary brand color - used for primary buttons'
+            ),
+            limestone: colorPaletteField('Limestone', '#D0D96F', 'Bright accent color'),
+            manatee: colorPaletteField(
+              'Manatee (Secondary)',
+              '#84BABF',
+              'Secondary color - used for secondary buttons'
+            ),
+            coral: colorPaletteField('Coral', '#D89B92', 'Soft accent - Rust at 75%'),
+            surf: colorPaletteField('Surf', '#0B4F6C', 'Deep blue'),
+            deepWater: colorPaletteField('Deep Water', '#073447', 'Darkest blue'),
+            milkweed: colorPaletteField('Milkweed', '#F2F3AE', 'Limestone at 50%'),
+            graphite: colorPaletteField('Graphite', '#39393B', 'Dark neutral'),
+            sand: colorPaletteField('Sand', '#FAF9F5', 'Light background'),
           },
           { label: 'Brand Colors' }
+        ),
+      },
+    }),
+
+    // =========================================
+    // BUSINESS INFO
+    // =========================================
+    businessInfo: singleton({
+      label: 'Business Info',
+      path: 'src/content/business-info',
+      format: { data: 'json' },
+      schema: {
+        contact: fields.object(
+          {
+            phone: fields.text({ label: 'Phone (Display)', defaultValue: '(352) 322-2402' }),
+            phoneRaw: fields.text({
+              label: 'Phone (Raw digits)',
+              defaultValue: '3523222402',
+              description: 'Used for tel: links',
+            }),
+            email: fields.text({ label: 'General Email', defaultValue: 'info@climbtheknot.com' }),
+            eventsEmail: fields.text({
+              label: 'Events Email',
+              defaultValue: 'events@climbtheknot.com',
+            }),
+          },
+          { label: 'Contact Information' }
+        ),
+        address: fields.object(
+          {
+            street: fields.text({ label: 'Street', defaultValue: '704 S Main St' }),
+            city: fields.text({ label: 'City', defaultValue: 'Gainesville' }),
+            state: fields.text({ label: 'State', defaultValue: 'FL' }),
+            zip: fields.text({ label: 'ZIP Code', defaultValue: '32601' }),
+          },
+          { label: 'Address' }
+        ),
+        hours: fields.array(
+          fields.object({
+            days: fields.text({ label: 'Days' }),
+            hours: fields.text({ label: 'Hours' }),
+          }),
+          {
+            label: 'Hours of Operation',
+            itemLabel: (props) => `${props.fields.days.value}: ${props.fields.hours.value}`,
+          }
+        ),
+        social: fields.object(
+          {
+            instagramUrl: fields.text({
+              label: 'Instagram URL',
+              defaultValue: 'https://www.instagram.com/climbtheknot',
+            }),
+            facebookUrl: fields.text({
+              label: 'Facebook URL',
+              defaultValue: 'https://www.facebook.com/climbtheknot',
+            }),
+          },
+          { label: 'Social Media' }
+        ),
+        portal: fields.object(
+          {
+            baseUrl: fields.text({
+              label: 'Member Portal Base URL',
+              defaultValue: 'https://portal.climbtheknot.com',
+            }),
+          },
+          { label: 'Redpoint Portal' }
+        ),
+        gym: fields.object(
+          {
+            capacityMax: fields.integer({
+              label: 'Max Capacity',
+              defaultValue: 100,
+            }),
+            copyrightEntity: fields.text({
+              label: 'Copyright Entity Name',
+              defaultValue: 'The Knot - Climbing Gym',
+            }),
+          },
+          { label: 'Gym Details' }
         ),
       },
     }),
@@ -137,16 +236,24 @@ export default config({
             }),
             buttonLink: fields.text({
               label: 'Button Link',
-              defaultValue: '/new-climber',
+              defaultValue: '/new-climbers',
             }),
             backgroundVideo: fields.text({
               label: 'Background Video URL',
               description: 'Path to video file (e.g., /videos/hero.mp4)',
             }),
+            backgroundVideoLibraryPath: videoLibraryField(
+              'Background Video (Media Library)',
+              'Select an existing video from the shared media library.'
+            ),
+            backgroundImageLibraryPath: imageLibraryField(
+              'Background Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
             backgroundImage: fields.image({
-              label: 'Background Image (fallback)',
-              directory: 'public/images/hero',
-              publicPath: '/images/hero/',
+              label: 'Upload New Background Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
             }),
           },
           { label: 'Hero Section' }
@@ -180,10 +287,14 @@ export default config({
               label: 'Button Link',
               defaultValue: 'https://portal.climbtheknot.com/gnv/memberships/join',
             }),
+            imageLibraryPath: imageLibraryField(
+              'Section Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
             image: fields.image({
-              label: 'Section Image',
-              directory: 'public/images/membership',
-              publicPath: '/images/membership/',
+              label: 'Upload New Section Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
             }),
           },
           { label: 'Membership Section' }
@@ -196,6 +307,74 @@ export default config({
             }),
           },
           { label: 'Not Ready to Commit Section' }
+        ),
+        ratesPoliciesHeadline: fields.text({
+          label: 'Rates & Policies Headline',
+          defaultValue: 'RATES & POLICIES',
+        }),
+        ratesPoliciesItems: fields.array(
+          fields.object({
+            title: fields.text({
+              label: 'Item Title',
+              defaultValue: 'BILLING & PAYMENTS',
+            }),
+            content: fields.text({
+              label: 'Item Content',
+              multiline: true,
+              defaultValue:
+                "Payments & billing changes processed on the 1st of each month.\n\nSubmit all change requests by the 25th to ensure they'll be processed before billing.",
+            }),
+            buttonText: fields.text({
+              label: 'Button Text (optional)',
+            }),
+            buttonLink: fields.text({
+              label: 'Button Link (optional)',
+            }),
+            order: fields.integer({
+              label: 'Display Order',
+              defaultValue: 99,
+              description: 'Lower numbers appear first.',
+            }),
+          }),
+          {
+            label: 'Rates & Policies Items',
+            itemLabel: () => 'Policy Item',
+          }
+        ),
+        ctaSection: fields.object(
+          {
+            enabled: fields.checkbox({
+              label: 'Show CTA Section',
+              defaultValue: true,
+            }),
+            headline: fields.text({
+              label: 'Headline',
+              defaultValue: 'READY TO GET STARTED?',
+            }),
+            subtext: fields.text({
+              label: 'Subtext',
+              defaultValue: 'Join the climbing community today and start your journey.',
+            }),
+            buttons: fields.array(
+              fields.object({
+                text: fields.text({ label: 'Button Text' }),
+                url: fields.text({ label: 'Button URL' }),
+                style: fields.select({
+                  label: 'Button Style',
+                  options: [
+                    { label: 'Blue (Primary)', value: 'blue' },
+                    { label: 'Red (Secondary)', value: 'red' },
+                  ],
+                  defaultValue: 'blue',
+                }),
+              }),
+              {
+                label: 'CTA Buttons',
+                itemLabel: (props) => props.fields.text.value || 'Button',
+              }
+            ),
+          },
+          { label: 'CTA Section ("Ready to Get Started?")' }
         ),
         codeOfConduct: fields.object(
           {
@@ -226,34 +405,95 @@ export default config({
       schema: {
         hero: fields.object(
           {
-            headline: fields.text({ label: 'Headline', defaultValue: 'ABOUT THE KNOT' }),
-            subtext: fields.text({ label: 'Subtext', multiline: true }),
+            headline: fields.text({ label: 'Headline', defaultValue: 'ABOUT & FAQ' }),
+            backgroundImageLibraryPath: imageLibraryField(
+              'Background Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
             backgroundImage: fields.image({
-              label: 'Background Image',
-              directory: 'public/images/about',
-              publicPath: '/images/about/',
+              label: 'Upload New Background Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
             }),
           },
           { label: 'Hero Section' }
         ),
-        mission: fields.object(
-          {
-            headline: fields.text({ label: 'Headline', defaultValue: 'OUR MISSION' }),
+        aboutIntro: fields.text({
+          label: 'About Us Intro Paragraph',
+          multiline: true,
+          description: 'Introductory paragraph shown below the hero section.',
+        }),
+        coreValuesHeadline: fields.text({
+          label: 'Core Values Headline',
+          defaultValue: 'CORE VALUES',
+        }),
+        coreValues: fields.array(
+          fields.object({
+            title: fields.text({ label: 'Value Title' }),
             content: fields.text({ label: 'Content', multiline: true }),
-          },
-          { label: 'Mission Section' }
-        ),
-        story: fields.object(
+          }),
           {
-            headline: fields.text({ label: 'Headline', defaultValue: 'OUR STORY' }),
-            content: fields.text({ label: 'Content', multiline: true }),
-          },
-          { label: 'Story Section' }
+            label: 'Core Values',
+            itemLabel: (props) => props.fields.title.value || 'Value',
+          }
         ),
-        teamHeadline: fields.text({
-          label: 'Team Section Headline',
+        meetTheTeamHeadline: fields.text({
+          label: 'Meet The Team Headline',
           defaultValue: 'MEET THE TEAM',
         }),
+        meetTheTeamIntro: fields.text({
+          label: 'Meet The Team Intro Paragraph',
+          multiline: true,
+          description: 'Introductory text shown above the team sections.',
+        }),
+        teamSections: fields.object(
+          {
+            ownersHeadline: fields.text({
+              label: 'Owners & Managers Headline',
+              defaultValue: 'OWNERS & MANAGERS',
+            }),
+            coordinatorsHeadline: fields.text({
+              label: 'Coordinators Headline',
+              defaultValue: 'COORDINATORS',
+            }),
+            staffHeadline: fields.text({
+              label: 'Staff Headline',
+              defaultValue: 'DESK STAFF & INSTRUCTORS',
+            }),
+          },
+          { label: 'Team Section Headings' }
+        ),
+        faqHeadline: fields.text({
+          label: 'FAQ Headline',
+          defaultValue: 'FREQUENTLY ASKED QUESTIONS',
+        }),
+        faqIntro: fields.text({
+          label: 'FAQ Intro Text',
+          multiline: true,
+          description: 'Text shown below the FAQ headline (e.g., "Don\'t see your answer...")',
+        }),
+        faqItems: fields.array(
+          fields.object({
+            title: fields.text({ label: 'Question' }),
+            content: fields.text({ label: 'Answer', multiline: true }),
+            buttonText: fields.text({ label: 'Button Text (optional)' }),
+            buttonLink: fields.text({ label: 'Button Link (optional)' }),
+          }),
+          {
+            label: 'FAQ Items',
+            itemLabel: (props) => props.fields.title.value || 'Question',
+          }
+        ),
+        feedbackButtons: fields.array(
+          fields.object({
+            text: fields.text({ label: 'Button Text' }),
+            url: fields.text({ label: 'Button URL' }),
+          }),
+          {
+            label: 'Feedback Buttons',
+            itemLabel: (props) => props.fields.text.value || 'Button',
+          }
+        ),
       },
     }),
 
@@ -269,28 +509,86 @@ export default config({
           {
             headline: fields.text({ label: 'Headline', defaultValue: 'MEMBERSHIP' }),
             subtext: fields.text({ label: 'Subtext', multiline: true }),
+            backgroundVideo: fields.text({
+              label: 'Background Video URL',
+              description: 'Path to video file (e.g., /images/canva-final/membership-hero.mp4)',
+            }),
+            backgroundVideoLibraryPath: videoLibraryField(
+              'Background Video (Media Library)',
+              'Select an existing video from the shared media library.'
+            ),
+            backgroundImageLibraryPath: imageLibraryField(
+              'Background Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            backgroundImage: fields.image({
+              label: 'Upload New Background Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
           { label: 'Hero Section' }
         ),
+        portalButton: fields.object(
+          {
+            text: fields.text({ label: 'Button Text', defaultValue: 'REDPOINT MEMBER PORTAL' }),
+            url: fields.text({
+              label: 'Button URL',
+              defaultValue: 'https://portal.climbtheknot.com',
+            }),
+          },
+          { label: 'Portal Button' }
+        ),
         pricing: fields.object(
           {
-            adultPrice: fields.text({ label: 'Adult Monthly Price', defaultValue: '$80' }),
-            youthPrice: fields.text({ label: 'Youth Monthly Price', defaultValue: '$45' }),
-            kidsPrice: fields.text({ label: 'Kids Monthly Price', defaultValue: '$25' }),
-            initiationFee: fields.text({ label: 'Initiation Fee', defaultValue: '$0' }),
+            headline: fields.text({
+              label: 'Pricing Headline',
+              defaultValue: 'START YOUR MEMBERSHIP TODAY FOR',
+            }),
+            promoPrice: fields.text({ label: 'Promo Price', defaultValue: '$XX' }),
+            monthlyPrice: fields.text({ label: 'Monthly Price', defaultValue: '$80/month' }),
+            billingText: fields.text({
+              label: 'Billing/Prorate Text',
+              multiline: true,
+              description: 'Full paragraph about proration and billing details.',
+            }),
+            cancelText: fields.text({ label: 'Cancel Text', defaultValue: 'Cancel anytime' }),
+            buttonText: fields.text({ label: 'CTA Button Text', defaultValue: 'JOIN NOW' }),
+            buttonUrl: fields.text({
+              label: 'CTA Button URL',
+              defaultValue: 'https://portal.climbtheknot.com/gnv/memberships/join',
+            }),
+            imageLibraryPath: imageLibraryField(
+              'Pricing Section Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            image: fields.image({
+              label: 'Upload New Pricing Section Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
-          { label: 'Pricing' }
+          { label: 'Pricing Section' }
         ),
         benefits: fields.array(
           fields.object({
             title: fields.text({ label: 'Benefit Title' }),
-            description: fields.text({ label: 'Description', multiline: true }),
+            description: fields.text({ label: 'Description (optional)' }),
           }),
           {
             label: 'Member Benefits',
             itemLabel: (props) => props.fields.title.value || 'Benefit',
           }
         ),
+        benefitsImageLibraryPath: imageLibraryField(
+          'Benefits Section Image (Media Library)',
+          'Select an existing image from the shared media library.'
+        ),
+        benefitsImage: fields.image({
+          label: 'Upload New Benefits Section Image (optional)',
+          directory: CMS_IMAGE_DIRECTORY,
+          publicPath: CMS_IMAGE_PUBLIC_PATH,
+        }),
       },
     }),
 
@@ -299,31 +597,111 @@ export default config({
     // =========================================
     newClimberPage: singleton({
       label: 'New Climber Page',
-      path: 'src/content/pages/new-climber',
+      path: 'src/content/pages/new-climbers',
       format: { data: 'json' },
       schema: {
         hero: fields.object(
           {
-            headline: fields.text({ label: 'Headline', defaultValue: 'NEW TO CLIMBING?' }),
-            subtext: fields.text({ label: 'Subtext', multiline: true }),
+            headline: fields.text({ label: 'Headline', defaultValue: 'NEW CLIMBERS' }),
+            backgroundImageLibraryPath: imageLibraryField(
+              'Background Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            backgroundImage: fields.image({
+              label: 'Upload New Background Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
           { label: 'Hero Section' }
         ),
-        gettingStarted: fields.object(
+        welcome: fields.object(
           {
-            headline: fields.text({ label: 'Headline', defaultValue: 'GETTING STARTED' }),
-            content: fields.text({ label: 'Content', multiline: true }),
+            headline: fields.text({ label: 'Headline', defaultValue: 'HI, WELCOME IN!' }),
+            paragraphs: fields.array(
+              fields.text({ label: 'Paragraph', multiline: true }),
+              {
+                label: 'Content Paragraphs',
+                itemLabel: (props) => props.value?.slice(0, 50) + '...' || 'Paragraph',
+              }
+            ),
+            imageLibraryPath: imageLibraryField(
+              'Welcome Section Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            image: fields.image({
+              label: 'Upload New Welcome Section Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
-          { label: 'Getting Started Section' }
+          { label: 'Welcome Section' }
         ),
-        dayPassInfo: fields.object(
+        dayPass: fields.object(
           {
             headline: fields.text({ label: 'Headline', defaultValue: 'DAY PASSES' }),
             price: fields.text({ label: 'Price', defaultValue: '$25' }),
-            description: fields.text({ label: 'Description', multiline: true }),
-            restrictions: fields.text({ label: 'Restrictions', multiline: true }),
+            gearText: fields.text({ label: 'Gear Text', defaultValue: '+ GEAR' }),
+            paragraphs: fields.array(
+              fields.text({ label: 'Paragraph', multiline: true }),
+              {
+                label: 'Content Paragraphs',
+                itemLabel: (props) => props.value?.slice(0, 50) + '...' || 'Paragraph',
+              }
+            ),
+            hoursTitle: fields.text({
+              label: 'Hours Section Title',
+              defaultValue: 'DAY PASS HOURS',
+            }),
+            hoursText: fields.array(
+              fields.text({ label: 'Hours Info', multiline: true }),
+              {
+                label: 'Hours Information',
+                itemLabel: (props) => props.value?.slice(0, 50) + '...' || 'Info',
+              }
+            ),
+            imageLibraryPath: imageLibraryField(
+              'Day Pass Section Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            image: fields.image({
+              label: 'Upload New Day Pass Section Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
-          { label: 'Day Pass Info' }
+          { label: 'Day Pass Section' }
+        ),
+        activitiesHeadline: fields.text({
+          label: 'Activities Section Headline',
+          description: 'Heading shown above the activity cards.',
+        }),
+        activitiesIntro: fields.text({
+          label: 'Activities Intro Text',
+          multiline: true,
+          description: 'Introductory paragraph for the activities section.',
+        }),
+        activityCards: fields.array(
+          fields.object({
+            title: fields.text({ label: 'Card Title' }),
+            description: fields.text({ label: 'Card Description', multiline: true }),
+            buttonText: fields.text({ label: 'Button Text' }),
+            buttonLink: fields.text({ label: 'Button Link' }),
+            imageLibraryPath: imageLibraryField(
+              'Card Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            image: fields.image({
+              label: 'Upload New Card Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
+            imageAlt: fields.text({ label: 'Image Alt Text' }),
+          }),
+          {
+            label: 'Activity Cards',
+            itemLabel: (props) => props.fields.buttonText.value || 'Activity Card',
+          }
         ),
       },
     }),
@@ -339,23 +717,60 @@ export default config({
         hero: fields.object(
           {
             headline: fields.text({ label: 'Headline', defaultValue: 'AMENITIES' }),
-            subtext: fields.text({ label: 'Subtext', multiline: true }),
+            backgroundImageLibraryPath: imageLibraryField(
+              'Background Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            backgroundImage: fields.image({
+              label: 'Upload New Background Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
           { label: 'Hero Section' }
         ),
-        features: fields.array(
+        sectionHeadline: fields.text({
+          label: 'Section Headline',
+          defaultValue: 'MORE THAN JUST CLIMBING',
+        }),
+        introText: fields.text({
+          label: 'Intro Paragraph',
+          multiline: true,
+          description: 'Introductory text shown below the section headline.',
+        }),
+        ctaText: fields.text({
+          label: 'CTA Paragraph',
+          multiline: true,
+          description: 'Paragraph shown above the CTA buttons.',
+        }),
+        amenityCards: fields.array(
           fields.object({
-            title: fields.text({ label: 'Feature Title' }),
+            title: fields.text({ label: 'Amenity Title' }),
             description: fields.text({ label: 'Description', multiline: true }),
+            imageLabel: fields.text({ label: 'Image Label' }),
+            imageLibraryPath: imageLibraryField(
+              'Amenity Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
             image: fields.image({
-              label: 'Feature Image',
-              directory: 'public/images/amenities',
-              publicPath: '/images/amenities/',
+              label: 'Upload New Amenity Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
             }),
           }),
           {
-            label: 'Facility Features',
-            itemLabel: (props) => props.fields.title.value || 'Feature',
+            label: 'Amenity Cards',
+            itemLabel: (props) => props.fields.title.value || 'Amenity',
+          }
+        ),
+        ctaButtons: fields.array(
+          fields.object({
+            text: fields.text({ label: 'Button Text' }),
+            url: fields.text({ label: 'Button URL' }),
+          }),
+          {
+            label: 'CTA Buttons',
+            itemLabel: (props) => props.fields.text.value || 'Button',
           }
         ),
       },
@@ -371,10 +786,28 @@ export default config({
       schema: {
         hero: fields.object(
           {
-            headline: fields.text({ label: 'Headline', defaultValue: 'GEAR SHOP' }),
-            subtext: fields.text({ label: 'Subtext', multiline: true }),
+            headline: fields.text({ label: 'Headline', defaultValue: 'SHOP' }),
+            backgroundImageLibraryPath: imageLibraryField(
+              'Background Image (Media Library)',
+              'Select an existing image from the shared media library.'
+            ),
+            backgroundImage: fields.image({
+              label: 'Upload New Background Image (optional)',
+              directory: CMS_IMAGE_DIRECTORY,
+              publicPath: CMS_IMAGE_PUBLIC_PATH,
+            }),
           },
           { label: 'Hero Section' }
+        ),
+        gearStoreButton: fields.object(
+          {
+            text: fields.text({ label: 'Button Text', defaultValue: 'Gear store' }),
+            url: fields.text({
+              label: 'Button URL',
+              defaultValue: 'https://portal.climbtheknot.com/gnv/shop',
+            }),
+          },
+          { label: 'Gear Store Button' }
         ),
         intro: fields.text({
           label: 'Intro Text',
@@ -397,11 +830,26 @@ export default config({
       schema: {
         name: fields.slug({ name: { label: 'Name' } }),
         role: fields.text({ label: 'Role/Title' }),
+        teamGroup: fields.select({
+          label: 'Team Section',
+          description: 'Controls which About page team section this person appears in.',
+          options: [
+            { label: 'Leadership (Owners & Managers)', value: 'leadership' },
+            { label: 'Coordinators', value: 'coordinator' },
+            { label: 'Desk Staff & Instructors', value: 'staff' },
+          ],
+          defaultValue: 'staff',
+        }),
+        photoLibraryPath: imageLibraryField(
+          'Photo (Media Library)',
+          'Select an existing file from the shared media library.'
+        ),
         bio: fields.text({ label: 'Bio', multiline: true }),
         photo: fields.image({
-          label: 'Photo',
-          directory: 'public/images/team',
-          publicPath: '/images/team/',
+          label: 'Upload New Photo (optional)',
+          description: 'Optional upload. Use Media Library above for existing files.',
+          directory: CMS_IMAGE_DIRECTORY,
+          publicPath: CMS_IMAGE_PUBLIC_PATH,
         }),
         order: fields.integer({
           label: 'Display Order',
@@ -409,7 +857,8 @@ export default config({
           description: 'Lower numbers appear first',
         }),
         isLeadership: fields.checkbox({
-          label: 'Leadership Team',
+          label: 'Leadership Team (legacy)',
+          description: 'Legacy fallback flag. Use Team Section above for placement.',
           defaultValue: false,
         }),
       },
@@ -428,10 +877,15 @@ export default config({
         date: fields.date({ label: 'Event Date' }),
         time: fields.text({ label: 'Time', description: 'e.g., 6:00 PM - 9:00 PM' }),
         description: fields.text({ label: 'Description', multiline: true }),
+        imageLibraryPath: imageLibraryField(
+          'Event Image (Media Library)',
+          'Select an existing file from the shared media library.'
+        ),
         image: fields.image({
-          label: 'Event Image',
-          directory: 'public/images/events',
-          publicPath: '/images/events/',
+          label: 'Upload New Event Image (optional)',
+          description: 'Optional upload. Use Media Library above for existing files.',
+          directory: CMS_IMAGE_DIRECTORY,
+          publicPath: CMS_IMAGE_PUBLIC_PATH,
         }),
         registrationLink: fields.text({
           label: 'Registration Link',
@@ -448,6 +902,99 @@ export default config({
         recurringSchedule: fields.text({
           label: 'Recurring Schedule',
           description: 'e.g., "Every Tuesday" (only if recurring)',
+        }),
+        address: fields.text({
+          label: 'Event Address',
+          description: 'Venue address if different from gym (e.g., 619 S Main St)',
+        }),
+        competitionDivisions: fields.array(
+          fields.object({
+            name: fields.text({ label: 'Division Name' }),
+            description: fields.text({ label: 'Description', multiline: true }),
+          }),
+          {
+            label: 'Competition Divisions',
+            itemLabel: (props) => props.fields.name.value || 'Division',
+          }
+        ),
+        schedule: fields.array(
+          fields.object({
+            time: fields.text({ label: 'Time' }),
+            activity: fields.text({ label: 'Activity' }),
+          }),
+          {
+            label: 'Event Schedule',
+            itemLabel: (props) => `${props.fields.time.value}: ${props.fields.activity.value}`,
+          }
+        ),
+        faqItems: fields.array(
+          fields.object({
+            question: fields.text({ label: 'Question' }),
+            answer: fields.text({ label: 'Answer', multiline: true }),
+          }),
+          {
+            label: 'Event FAQ',
+            itemLabel: (props) => props.fields.question.value || 'FAQ',
+          }
+        ),
+        merchandise: fields.array(
+          fields.object({
+            name: fields.text({ label: 'Item Name' }),
+            description: fields.text({ label: 'Description', multiline: true }),
+            price: fields.text({ label: 'Price' }),
+            preorderLink: fields.text({ label: 'Pre-order Link' }),
+          }),
+          {
+            label: 'Merchandise / Pre-orders',
+            itemLabel: (props) => props.fields.name.value || 'Item',
+          }
+        ),
+      },
+    }),
+
+    // =========================================
+    // MEDIA ASSETS (Shared Library Index)
+    // =========================================
+    mediaAssets: collection({
+      label: 'Media Assets',
+      slugField: 'name',
+      path: 'src/content/media-assets/*',
+      format: { data: 'json' },
+      schema: {
+        name: fields.slug({ name: { label: 'Asset Name' } }),
+        category: fields.select({
+          label: 'Category',
+          options: [
+            { label: 'Home', value: 'home' },
+            { label: 'About', value: 'about' },
+            { label: 'New Climbers', value: 'new-climbers' },
+            { label: 'Membership', value: 'membership' },
+            { label: 'Amenities', value: 'amenities' },
+            { label: 'Events', value: 'events' },
+            { label: 'Shop', value: 'shop' },
+            { label: 'Team', value: 'team' },
+            { label: 'Global', value: 'global' },
+            { label: 'Other', value: 'other' },
+          ],
+          defaultValue: 'other',
+        }),
+        filePath: fields.pathReference({
+          label: 'Media File (Library)',
+          description: 'Select an existing media file from the shared library.',
+          pattern: CMS_MEDIA_LIBRARY_PATTERN,
+        }),
+        altText: fields.text({
+          label: 'Alt Text',
+          description: 'Used when this asset appears as an image on the site.',
+        }),
+        tags: fields.array(fields.text({ label: 'Tag' }), {
+          label: 'Tags',
+          itemLabel: (props) => props.value || 'Tag',
+        }),
+        notes: fields.text({
+          label: 'Notes',
+          multiline: true,
+          description: 'Optional internal notes for editors.',
         }),
       },
     }),
@@ -467,7 +1014,6 @@ export default config({
           formatting: true,
           links: true,
           dividers: true,
-          lists: true,
         }),
         buttonText: fields.text({ label: 'Button Text (optional)' }),
         buttonLink: fields.text({ label: 'Button Link (optional)' }),
@@ -491,15 +1037,22 @@ export default config({
         name: fields.slug({ name: { label: 'Product Name' } }),
         price: fields.text({ label: 'Price', description: 'e.g., $29.99' }),
         description: fields.text({ label: 'Description', multiline: true }),
+        imageLibraryPaths: fields.array(
+          imageLibraryField('Product Image (Media Library)', 'Select an existing image from the shared media library.'),
+          {
+            label: 'Product Images (Media Library)',
+            itemLabel: () => 'Library Image',
+          }
+        ),
         images: fields.array(
           fields.image({
-            label: 'Image',
-            directory: 'public/images/products',
-            publicPath: '/images/products/',
+            label: 'Upload New Image (optional)',
+            directory: CMS_IMAGE_DIRECTORY,
+            publicPath: CMS_IMAGE_PUBLIC_PATH,
           }),
           {
-            label: 'Product Images',
-            itemLabel: (props) => 'Image',
+            label: 'Product Images (Upload Fallback)',
+            itemLabel: () => 'Uploaded Image',
           }
         ),
         sizes: fields.array(fields.text({ label: 'Size' }), {
@@ -510,8 +1063,9 @@ export default config({
           label: 'Category',
           options: [
             { label: 'Apparel', value: 'apparel' },
-            { label: 'Gear', value: 'gear' },
-            { label: 'Accessories', value: 'accessories' },
+            { label: 'Essentials', value: 'essentials' },
+            { label: 'Top-Rope Gear', value: 'top-rope-gear' },
+            { label: 'Climbing Shoes', value: 'climbing-shoes' },
           ],
           defaultValue: 'apparel',
         }),
@@ -539,10 +1093,14 @@ export default config({
         description: fields.text({ label: 'Description', multiline: true }),
         buttonText: fields.text({ label: 'Button Text' }),
         buttonLink: fields.text({ label: 'Button Link' }),
+        imageLibraryPath: imageLibraryField(
+          'Card Image (Media Library)',
+          'Select an existing image from the shared media library.'
+        ),
         image: fields.image({
-          label: 'Card Image',
-          directory: 'public/images/cards',
-          publicPath: '/images/cards/',
+          label: 'Upload New Card Image (optional)',
+          directory: CMS_IMAGE_DIRECTORY,
+          publicPath: CMS_IMAGE_PUBLIC_PATH,
         }),
         order: fields.integer({
           label: 'Display Order',

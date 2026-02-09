@@ -1,68 +1,139 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
 
-interface AmenityCard {
+const amenitiesFallback: Array<{
   title: string;
   description: string;
   imageLabel: string;
-  labelPosition: 'left' | 'center' | 'right';
-}
-
-const amenitiesRow1: AmenityCard[] = [
+  image?: string;
+  imageLibraryPath?: string;
+}> = [
   {
     title: 'BOULDERING',
-    description: '5,000+ square feet of bouldering walls with a variety of angles and routes for all skill levels',
+    description: 'Our bouldering area features a wide variety of problems for all skill levels. With regular route setting and a diverse range of holds, there\'s always something new to try.',
     imageLabel: 'Pic of bouldering',
-    labelPosition: 'left',
   },
   {
-    title: 'TOP-ROPE',
-    description: '17 anchors with 30+ routes – belay certification or staff belayer required',
+    title: 'TOP-ROPE CLIMBING',
+    description: 'Experience the thrill of climbing to new heights with our top-rope walls. Our auto-belays and lead walls provide challenges for climbers of every ability.',
     imageLabel: 'Pic of staff belay/top-roping',
-    labelPosition: 'center',
   },
   {
-    title: 'YOGA & FITNESS CLASSES',
-    description: 'Free yoga and fitness classes included with membership – check the schedule for class times',
-    imageLabel: 'Pic of yoga class',
-    labelPosition: 'right',
-  },
-];
-
-const amenitiesRow2: AmenityCard[] = [
-  {
-    title: 'FREE GEAR RENTAL',
-    description: 'Climbing shoes, harnesses, and chalk bags available at no extra cost for members',
-    imageLabel: 'Rental gear pic',
-    labelPosition: 'left',
-  },
-  {
-    title: 'FREE BELAY CLASSES',
-    description: 'Learn to belay with our certified instructors – training included with membership',
-    imageLabel: 'Belay class pic',
-    labelPosition: 'center',
-  },
-  {
-    title: 'EXTENSIVE TRAINING AREA & ON-SITE SHOWERS',
-    description: 'Dedicated training equipment, hangboards, campus boards, and clean shower facilities',
+    title: 'TRAINING AREA',
+    description: 'Take your climbing to the next level with our dedicated training area. From hangboards to campus boards, we have the tools you need to build strength and improve technique.',
     imageLabel: 'Training area pic',
-    labelPosition: 'right',
+  },
+  {
+    title: 'YOGA STUDIO',
+    description: 'Complement your climbing with yoga! Our studio offers classes designed to improve flexibility, balance, and mental focus — all key components of climbing performance.',
+    imageLabel: 'Pic of yoga class',
+  },
+  {
+    title: 'GEAR SHOP',
+    description: 'Find everything you need right here at The Knot. From shoes to chalk bags, our pro shop stocks quality climbing gear and branded merchandise.',
+    imageLabel: 'Gear shop pic',
+  },
+  {
+    title: 'COMMUNITY EVENTS',
+    description: 'From competitions to clinics, movie nights to member meetups — there\'s always something happening at The Knot. Check our events page for the latest.',
+    imageLabel: 'Community events pic',
   },
 ];
----
 
+const amenitiesPathCandidates = [
+  path.join(process.cwd(), 'src/content/pages/amenities.json'),
+  path.join(process.cwd(), 'src/content/pages/amenities/index.json'),
+];
+const amenitiesPath =
+  amenitiesPathCandidates.find((candidatePath) => fs.existsSync(candidatePath)) ||
+  amenitiesPathCandidates[0];
+
+let amenitiesPage: {
+  hero?: {
+    headline?: string;
+    backgroundImage?: string;
+    backgroundImageLibraryPath?: string;
+  };
+  sectionHeadline?: string;
+  introText?: string;
+  amenityCards?: {
+    title?: string;
+    description?: string;
+    imageLabel?: string;
+    image?: string;
+    imageLibraryPath?: string;
+  }[];
+  ctaText?: string;
+  ctaButtons?: { text?: string; url?: string }[];
+};
+
+try {
+  amenitiesPage = JSON.parse(fs.readFileSync(amenitiesPath, 'utf-8'));
+} catch {
+  amenitiesPage = {
+    hero: {
+      headline: 'AMENITIES',
+      backgroundImage: '/images/canva-final/canva-hills-background.jpg',
+    },
+    sectionHeadline: 'MORE THAN JUST CLIMBING',
+    introText: 'Whether you\'re here to crush a new boulder problem, train for your next outdoor adventure, or just hang out with the community, The Knot has something for everyone.',
+    amenityCards: amenitiesFallback.map((card) => ({
+      ...card,
+      image: '/images/canva-final/canva-hills-background.jpg',
+    })),
+    ctaText: 'Don\'t just take our word for it — come see for yourself! Whether you\'re looking for a new way to stay active, a fun outing with friends, or a welcoming community to be part of, The Knot has something for everyone.',
+    ctaButtons: [
+      { text: 'CLASS SCHEDULE', url: 'https://portal.climbtheknot.com/gnv/calendar' },
+      { text: 'BELAY CLASSES', url: 'https://portal.climbtheknot.com/gnv/services/belay-class' },
+    ],
+  };
+}
+
+const toPublicUrl = (libraryPath?: string) =>
+  libraryPath && libraryPath.startsWith('public/')
+    ? `/${libraryPath.slice('public/'.length)}`
+    : undefined;
+
+const heroContent = amenitiesPage.hero || {};
+const heroImage =
+  toPublicUrl(heroContent.backgroundImageLibraryPath) ||
+  heroContent.backgroundImage ||
+  '/images/canva-final/canva-hills-background.jpg';
+const amenitiesCards =
+  Array.isArray(amenitiesPage.amenityCards) && amenitiesPage.amenityCards.length > 0
+    ? amenitiesPage.amenityCards
+    : amenitiesFallback;
+const ctaButtons =
+  Array.isArray(amenitiesPage.ctaButtons) && amenitiesPage.ctaButtons.length > 0
+    ? amenitiesPage.ctaButtons
+    : [
+        { text: 'CLASS SCHEDULE', url: 'https://portal.climbtheknot.com/gnv/calendar' },
+        { text: 'BELAY CLASSES', url: 'https://portal.climbtheknot.com/gnv/services/belay-class' },
+      ];
+const introText = amenitiesPage.introText || '';
+const ctaText = amenitiesPage.ctaText || '';
+
+const cardRows: typeof amenitiesCards[] = [];
+for (let index = 0; index < amenitiesCards.length; index += 3) {
+  cardRows.push(amenitiesCards.slice(index, index + 3));
+}
+
+const labelPositionClasses = ['left', 'center', 'right'] as const;
+---
 <BaseLayout title="Amenities">
   <!-- Hero Section with design slide background -->
   <section class="hero-section">
     <div class="hero-background">
       <img
-        src="/images/amenities/hero-design-slide.png"
+        src={heroImage}
         alt="Amenities hero background"
       />
     </div>
 
     <div class="hero-content">
-      <h1 class="hero-headline">AMENITIES</h1>
+      <h1 class="hero-headline">{heroContent.headline || 'AMENITIES'}</h1>
     </div>
 
     <!-- Video placeholder in top right -->
@@ -75,121 +146,81 @@ const amenitiesRow2: AmenityCard[] = [
 
   <!-- More Than Just Climbing Section -->
   <section class="amenities-grid-section">
-    <h2 class="section-heading">MORE THAN JUST CLIMBING</h2>
+    <h2 class="section-heading">{amenitiesPage.sectionHeadline || 'MORE THAN JUST CLIMBING'}</h2>
 
-    <!-- Row 1 -->
-    <div class="amenities-grid">
-      {amenitiesRow1.map((amenity) => (
-        <div class="amenity-card">
-          <div class="card-image">
-            <div class="placeholder-bg">
-              <div class="placeholder-sky"></div>
-              <div class="placeholder-clouds">
-                <div class="cloud cloud-left"></div>
-                <div class="cloud cloud-right"></div>
-              </div>
-              <div class="placeholder-hills">
-                <div class="hill hill-back"></div>
-                <div class="hill hill-front"></div>
-              </div>
-            </div>
-            <div class={`card-label label-${amenity.labelPosition}`}>
-              <span>{amenity.imageLabel}</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">{amenity.title}</h3>
-            <p class="card-description">{amenity.description}</p>
-          </div>
-        </div>
-      ))}
-    </div>
+    {introText && (
+      <p class="section-intro">{introText}</p>
+    )}
 
-    <!-- Row 2 -->
-    <div class="amenities-grid row-2">
-      {amenitiesRow2.map((amenity) => (
-        <div class="amenity-card">
-          <div class="card-image">
-            <div class="placeholder-bg">
-              <div class="placeholder-sky"></div>
-              <div class="placeholder-clouds">
-                <div class="cloud cloud-left"></div>
-                <div class="cloud cloud-right"></div>
+    {cardRows.map((row, rowIndex) => (
+      <div class={`amenities-grid ${rowIndex === cardRows.length - 1 ? 'row-2' : ''}`}>
+        {row.map((amenity, amenityIndex) => {
+          const cardImage = toPublicUrl(amenity.imageLibraryPath) || amenity.image;
+          const labelPosition = labelPositionClasses[amenityIndex % labelPositionClasses.length];
+          return (
+            <div class="amenity-card">
+              <div class="card-image">
+                {cardImage ? (
+                  <img
+                    src={cardImage}
+                    alt={amenity.imageLabel || amenity.title || 'Amenity image'}
+                    class="amenity-image"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div class="placeholder-bg">
+                    <div class="placeholder-sky"></div>
+                    <div class="placeholder-clouds">
+                      <div class="cloud cloud-left"></div>
+                      <div class="cloud cloud-right"></div>
+                    </div>
+                    <div class="placeholder-hills">
+                      <div class="hill hill-back"></div>
+                      <div class="hill hill-front"></div>
+                    </div>
+                  </div>
+                )}
+                <div class={`card-label label-${labelPosition}`}>
+                  <span>{amenity.imageLabel || 'Amenity image'}</span>
+                </div>
               </div>
-              <div class="placeholder-hills">
-                <div class="hill hill-back"></div>
-                <div class="hill hill-front"></div>
+              <div class="card-content">
+                <h3 class="card-title">{amenity.title}</h3>
+                <p class="card-description">{amenity.description}</p>
               </div>
             </div>
-            <div class={`card-label label-${amenity.labelPosition}`}>
-              <span>{amenity.imageLabel}</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">{amenity.title}</h3>
-            <p class="card-description">{amenity.description}</p>
-          </div>
-        </div>
-      ))}
-    </div>
+          );
+        })}
+      </div>
+    ))}
+
+    {ctaText && (
+      <p class="section-cta-text">{ctaText}</p>
+    )}
 
     <!-- CTA Buttons -->
     <div class="cta-row">
-      <a
-        href="https://portal.climbtheknot.com/gnv/calendar"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="cta-button"
-      >
-        CLASS SCHEDULE
-      </a>
-      <a
-        href="https://portal.climbtheknot.com/gnv/services/belay-class"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="cta-button"
-      >
-        BELAY CLASSES
-      </a>
+      {ctaButtons.map((button) => (
+        <a
+          href={button.url || '#'}
+          target={(button.url || '').startsWith('http') ? '_blank' : undefined}
+          rel={(button.url || '').startsWith('http') ? 'noopener noreferrer' : undefined}
+          class="cta-button"
+        >
+          {button.text || 'LEARN MORE'}
+        </a>
+      ))}
     </div>
   </section>
 
-  <!-- Gym Tour Video Section -->
-  <section class="gym-tour-section">
-    <div class="tour-video-container">
-      <div class="tour-placeholder">
-        <div class="placeholder-sky"></div>
-        <div class="placeholder-clouds">
-          <div class="cloud cloud-1"></div>
-          <div class="cloud cloud-2"></div>
-          <div class="cloud cloud-3"></div>
-        </div>
-        <div class="placeholder-hills">
-          <div class="hill hill-back"></div>
-          <div class="hill hill-front"></div>
-        </div>
-      </div>
-      <div class="tour-label">
-        <svg
-          width="40"
-          height="30"
-          viewBox="0 0 40 30"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <polygon points="15,7 28,15 15,23" fill="white" />
-        </svg>
-        <span>Gym tour overview video</span>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
 
 <style>
   /* Hero Section */
   .hero-section {
     position: relative;
-    height: 280px;
+    height: 50vh;
     overflow: hidden;
   }
 
@@ -292,11 +323,18 @@ const amenitiesRow2: AmenityCard[] = [
     border: 3px solid black;
   }
 
+  .amenity-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
   .placeholder-bg {
     position: relative;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
+    background: url('/images/canva-final/canva-hills-background.jpg') center/cover no-repeat;
   }
 
   .placeholder-sky {
@@ -480,169 +518,31 @@ const amenitiesRow2: AmenityCard[] = [
     opacity: 0.9;
   }
 
-  /* Gym Tour Section */
-  .gym-tour-section {
-    padding: 0 5% 60px;
-    background: white;
-  }
-
-  .tour-video-container {
-    position: relative;
-    max-width: 800px;
-    margin: 0 auto;
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    border: 3px solid black;
-  }
-
-  .tour-placeholder {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
-  }
-
-  .tour-placeholder .placeholder-sky {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 70%;
-    background: linear-gradient(to bottom, #D6EEF5 0%, #D6EEF5 100%);
-  }
-
-  .tour-placeholder .placeholder-clouds {
-    position: absolute;
-    top: 10%;
-    left: 0;
-    right: 0;
-    height: 40%;
-  }
-
-  .tour-placeholder .cloud {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-  }
-
-  .tour-placeholder .cloud::before,
-  .tour-placeholder .cloud::after {
-    content: '';
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-  }
-
-  .tour-placeholder .cloud-1 {
-    width: 60px;
-    height: 25px;
-    top: 20%;
-    left: 15%;
-  }
-
-  .tour-placeholder .cloud-1::before {
-    width: 30px;
-    height: 30px;
-    top: -15px;
-    left: 10px;
-  }
-
-  .tour-placeholder .cloud-1::after {
-    width: 35px;
-    height: 35px;
-    top: -18px;
-    left: 25px;
-  }
-
-  .tour-placeholder .cloud-2 {
-    width: 50px;
-    height: 20px;
-    top: 30%;
-    left: 45%;
-  }
-
-  .tour-placeholder .cloud-2::before {
-    width: 25px;
-    height: 25px;
-    top: -12px;
-    left: 8px;
-  }
-
-  .tour-placeholder .cloud-2::after {
-    width: 28px;
-    height: 28px;
-    top: -14px;
-    left: 20px;
-  }
-
-  .tour-placeholder .cloud-3 {
-    width: 70px;
-    height: 28px;
-    top: 25%;
-    right: 15%;
-  }
-
-  .tour-placeholder .cloud-3::before {
-    width: 35px;
-    height: 35px;
-    top: -18px;
-    left: 12px;
-  }
-
-  .tour-placeholder .cloud-3::after {
-    width: 40px;
-    height: 40px;
-    top: -20px;
-    left: 30px;
-  }
-
-  .tour-placeholder .placeholder-hills {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 45%;
-  }
-
-  .tour-placeholder .hill {
-    position: absolute;
-    bottom: 0;
-    border-radius: 50% 50% 0 0;
-  }
-
-  .tour-placeholder .hill-back {
-    width: 120%;
-    height: 85%;
-    left: -10%;
-    background: #8FB339;
-  }
-
-  .tour-placeholder .hill-front {
-    width: 100%;
-    height: 65%;
-    left: 15%;
-    background: #5C8A2B;
-  }
-
-  .tour-label {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    background: var(--color-rust);
-    padding: 12px 16px;
-    border: 3px solid black;
-  }
-
-  .tour-label span {
+  /* Intro & CTA text paragraphs */
+  .section-intro {
     font-family: var(--font-body);
-    font-size: 11px;
-    color: white;
-    text-transform: uppercase;
-    white-space: nowrap;
+    font-size: 16px;
+    color: #444;
+    line-height: 1.7;
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 40px;
+  }
+
+  .section-cta-text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: #444;
+    line-height: 1.7;
+    text-align: center;
+    max-width: 760px;
+    margin: 40px auto 0;
+  }
+
+  .placeholder-sky,
+  .placeholder-clouds,
+  .placeholder-hills {
+    display: none;
   }
 
   /* Mobile Responsive */
@@ -701,18 +601,10 @@ const amenitiesRow2: AmenityCard[] = [
       max-width: 240px;
     }
 
-    .gym-tour-section {
-      padding: 0 5% 40px;
-    }
-
-    .tour-video-container {
-      aspect-ratio: 16/10;
-    }
-
-    .tour-label {
-      bottom: 10px;
-      right: 10px;
-      padding: 10px 12px;
+    .section-intro,
+    .section-cta-text {
+      font-size: 14px;
     }
   }
 </style>
+

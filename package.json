@@ -5,15 +5,32 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "canva:assets": "node ./scripts/canva-connect-media.mjs search-assets",
+    "canva:pull": "node ./scripts/canva-connect-media.mjs pull-asset",
+    "canva:export": "node ./scripts/canva-connect-media.mjs export-design",
+    "canva:presets": "node ./scripts/canva-connect-media.mjs presets",
+    "clean:dev-cache": "node ./scripts/dev-keystatic-safe.mjs",
+    "dev:keystatic": "npm run clean:dev-cache && npm run dev:local -- --force",
+    "cms:media-map": "node ./scripts/generate-cms-media-map.mjs",
+    "cms:fix-collection-images": "node ./scripts/migrate-keystatic-collection-images.mjs",
+    "cms:sync-library-paths": "node ./scripts/sync-media-library-path-fields.mjs",
+    "cms:sync-media-assets": "node ./scripts/sync-media-assets-collection.mjs",
+    "cms:audit": "node ./scripts/audit-cms-connectivity.mjs",
+    "dev:local": "astro dev --host 127.0.0.1 --port 4325 --strictPort",
+    "check": "astro check",
+    "guardrails:validate": "node ./scripts/validate-prd-contract.mjs",
+    "guardrails:fidelity": "node ./scripts/validate-canva-fidelity.mjs",
+    "guardrails:quality": "npm run guardrails:validate && npm run guardrails:fidelity && npm run cms:audit && npm run check && npm run build",
     "build": "astro build",
     "preview": "astro preview",
+    "preview:local": "astro preview --host 127.0.0.1 --port 4326 --strictPort",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.0.0",
     "@astrojs/react": "^4.0.0",
     "@astrojs/tailwind": "^6.0.0",
-    "@keystatic/astro": "^5.0.0",
+    "@keystatic/astro": "^5.0.6",
     "@keystatic/core": "^0.5.0",
     "astro": "^5.0.0",
     "react": "^18.3.1",
@@ -21,6 +38,8 @@
     "tailwindcss": "^3.4.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@types/node": "^25.2.1",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "typescript": "^5.0.0"

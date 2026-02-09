@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react';
 
 interface ShopProduct {
   id: string;
-  name: string;
-  price: number;
-  description: string;
-  category: 'apparel' | 'essentials' | 'top-rope-gear' | 'climbing-shoes';
-  sizes?: string[];
-  colors?: string[];
-  images: string[];
+  slug?: string;
+  data: {
+    name: string;
+    price: string;
+    description?: string;
+    category: 'apparel' | 'gear' | 'accessories';
+    sizes?: string[];
+    imageLibraryPaths?: string[];
+    images?: string[];
+    inStock: boolean;
+    order: number;
+  };
 }
 
 interface ProductModalProps {
@@ -19,12 +24,10 @@ interface ProductModalProps {
 
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (product) {
       setSelectedSize(null);
-      setSelectedColor(null);
     }
   }, [product]);
 
@@ -44,10 +47,18 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
   if (!isOpen || !product) return null;
 
-  const isDisabled = (product.sizes && !selectedSize) || (product.colors && !selectedColor);
+  const toPublicUrl = (libraryPath?: string) =>
+    libraryPath && libraryPath.startsWith('public/')
+      ? `/${libraryPath.slice('public/'.length)}`
+      : undefined;
+  const productImages = (product.data.imageLibraryPaths || [])
+    .map((entry) => toPublicUrl(entry))
+    .filter((entry): entry is string => Boolean(entry));
+  const resolvedImages = productImages.length > 0 ? productImages : (product.data.images || []);
+  const isDisabled = (product.data.sizes && product.data.sizes.length > 0 && !selectedSize);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Product details">
       <div className="modal-container" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose} aria-label="Close modal">
           ×
@@ -55,27 +66,35 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
         <div className="modal-content">
           <div className="modal-image-column">
-            <svg
-              viewBox="0 0 400 400"
-              preserveAspectRatio="xMidYMid slice"
-              style={{ width: '100%', height: '100%' }}
-            >
-              <defs>
-                <linearGradient id="modalProductSkyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#87CEEB" />
-                  <stop offset="100%" stopColor="#B0E0E6" />
-                </linearGradient>
-              </defs>
-              <rect width="400" height="400" fill="url(#modalProductSkyGrad)" />
-              <ellipse cx="70" cy="50" rx="45" ry="28" fill="white" opacity="0.9" />
-              <ellipse cx="110" cy="58" rx="38" ry="24" fill="white" opacity="0.9" />
-              <ellipse cx="310" cy="65" rx="50" ry="30" fill="white" opacity="0.9" />
-              <ellipse cx="200" cy="350" rx="280" ry="100" fill="#90EE90" />
-              <ellipse cx="130" cy="375" rx="200" ry="70" fill="#7CCD7C" />
-            </svg>
-            {product.images.length > 1 && (
+            {resolvedImages.length > 0 ? (
+              <img
+                src={resolvedImages[0]}
+                alt={product.data.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <svg
+                viewBox="0 0 400 400"
+                preserveAspectRatio="xMidYMid slice"
+                style={{ width: '100%', height: '100%' }}
+              >
+                <defs>
+                  <linearGradient id="modalProductSkyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#87CEEB" />
+                    <stop offset="100%" stopColor="#B0E0E6" />
+                  </linearGradient>
+                </defs>
+                <rect width="400" height="400" fill="url(#modalProductSkyGrad)" />
+                <ellipse cx="70" cy="50" rx="45" ry="28" fill="white" opacity="0.9" />
+                <ellipse cx="110" cy="58" rx="38" ry="24" fill="white" opacity="0.9" />
+                <ellipse cx="310" cy="65" rx="50" ry="30" fill="white" opacity="0.9" />
+                <ellipse cx="200" cy="350" rx="280" ry="100" fill="#90EE90" />
+                <ellipse cx="130" cy="375" rx="200" ry="70" fill="#7CCD7C" />
+              </svg>
+            )}
+            {resolvedImages.length > 1 && (
               <div className="modal-carousel-dots">
-                {product.images.map((_, index) => (
+                {resolvedImages.map((_, index) => (
                   <span
                     key={index}
                     className={`modal-dot ${index === 0 ? 'active' : ''}`}
@@ -86,38 +105,23 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           </div>
 
           <div className="modal-details-column">
-            <h2 className="modal-product-name">{product.name}</h2>
-            <p className="modal-product-price">PRICE $$</p>
-            <p className="modal-product-description">{product.description}</p>
+            <h2 className="modal-product-name">{product.data.name}</h2>
+            <p className="modal-product-price">{product.data.price}</p>
+            <p className="modal-product-description">{product.data.description ?? ''}</p>
 
-            {product.sizes && (
+            {product.data.sizes && product.data.sizes.length > 0 && (
               <div className="modal-size-selector">
                 <p className="modal-size-label">SIZE</p>
                 <div className="modal-size-buttons">
-                  {product.sizes.map((size) => (
+                  {product.data.sizes.map((size) => (
                     <button
                       key={size}
                       className={`modal-size-button ${selectedSize === size ? 'selected' : ''}`}
                       onClick={() => setSelectedSize(size)}
+                      aria-label={`Select size ${size}`}
+                      aria-pressed={selectedSize === size}
                     >
                       {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {product.colors && (
-              <div className="modal-color-selector">
-                <p className="modal-color-label">COLOR</p>
-                <div className="modal-color-buttons">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color}
-                      className={`modal-color-button ${selectedColor === color ? 'selected' : ''}`}
-                      onClick={() => setSelectedColor(color)}
-                    >
-                      {color}
                     </button>
                   ))}
                 </div>
@@ -127,6 +131,8 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
             <button
               className={`modal-add-to-cart ${isDisabled ? 'disabled' : ''}`}
               disabled={!!isDisabled}
+              aria-disabled={!!isDisabled}
+              aria-label={isDisabled ? "Select a size to add to cart" : "Add to cart"}
             >
               ADD TO CART
             </button>

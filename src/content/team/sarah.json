@@ -2,7 +2,9 @@
   "name": "SARAH",
   "role": "Staff",
   "bio": "",
-  "photo": "/images/canva-final/staff-sarah.jpg",
+  "photo": "/images/canva-final/sarah/staff-sarah.jpg",
   "order": 26,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "staff",
+  "photoLibraryPath": "public/images/canva-final/sarah/staff-sarah.jpg"
 }

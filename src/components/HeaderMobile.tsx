@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface NavItem {
   label: string;
@@ -13,6 +13,10 @@ interface HeaderMobileProps {
 
 export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -26,17 +30,79 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Move focus to an obvious close control when the menu opens.
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [isOpen]);
+
+  // Handle Escape key to close menu
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
+  // Focus trap for mobile menu
+  useEffect(() => {
+    if (!isOpen || !menuRef.current) return;
+
+    const menu = menuRef.current;
+    const focusableElements = menu.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement || document.activeElement === buttonRef.current) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          buttonRef.current?.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleTabKey);
+    return () => document.removeEventListener('keydown', handleTabKey);
+  }, [isOpen]);
+
   const handleNavClick = () => {
     setIsOpen(false);
   };
+
+  const iconColor = isHome || isScrolled ? '#f0f0f0' : '#000';
 
   return (
     <>
       {/* Hamburger Button */}
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
+        aria-controls="mobile-menu"
         style={{
           background: 'none',
           border: 'none',
@@ -59,7 +125,7 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
               position: 'absolute',
               width: '100%',
               height: '2px',
-              backgroundColor: 'black',
+              backgroundColor: iconColor,
               top: isOpen ? '8px' : '0',
               transform: isOpen ? 'rotate(45deg)' : 'none',
               transition: 'all 0.3s ease',
@@ -70,7 +136,7 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
               position: 'absolute',
               width: '100%',
               height: '2px',
-              backgroundColor: 'black',
+              backgroundColor: iconColor,
               top: '8px',
               opacity: isOpen ? 0 : 1,
               transition: 'opacity 0.3s ease',
@@ -81,7 +147,7 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
               position: 'absolute',
               width: '100%',
               height: '2px',
-              backgroundColor: 'black',
+              backgroundColor: iconColor,
               top: isOpen ? '8px' : '16px',
               transform: isOpen ? 'rotate(-45deg)' : 'none',
               transition: 'all 0.3s ease',
@@ -92,6 +158,11 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
 
       {/* Mobile Menu Overlay */}
       <div
+        id="mobile-menu"
+        ref={menuRef}
+        role="dialog"
+        aria-label="Mobile navigation menu"
+        aria-modal="true"
         style={{
           position: 'fixed',
           top: 0,
@@ -99,7 +170,7 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
           right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          zIndex: 999,
+          zIndex: 1100,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -109,14 +180,15 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
           transition: 'opacity 0.3s ease, visibility 0.3s ease',
         }}
       >
-        <ul
-          style={{
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
-            textAlign: 'center',
-          }}
-        >
+        <nav aria-label="Mobile navigation" style={{ marginBottom: '14px' }}>
+          <ul
+            style={{
+              listStyle: 'none',
+              margin: 0,
+              padding: 0,
+              textAlign: 'center',
+            }}
+          >
           {navItems.map((item, index) => (
             <li
               key={item.label}
@@ -143,7 +215,37 @@ export default function HeaderMobile({ navItems, isHome = false }: HeaderMobileP
               </a>
             </li>
           ))}
-        </ul>
+          </ul>
+        </nav>
+
+        <button
+          ref={closeButtonRef}
+          type="button"
+          onClick={() => setIsOpen(false)}
+          aria-label="Close menu"
+          style={{
+            minWidth: '132px',
+            height: '42px',
+            borderRadius: '4px',
+            border: '1px solid rgba(201, 201, 201, 0.72)',
+            background: 'transparent',
+            color: '#c9c9c9',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            fontSize: '15px',
+            fontWeight: 700,
+            lineHeight: 1,
+            padding: '0 16px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}
+        >
+          <span>Close</span>
+          <span aria-hidden="true" style={{ fontSize: '18px', transform: 'translateY(-1px)' }}>X</span>
+        </button>
       </div>
     </>
   );

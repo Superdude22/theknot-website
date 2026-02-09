@@ -29,13 +29,21 @@ export default {
       },
       letterSpacing: {
         heading: '-0.02em',
+        tight: '-0.02em',
       },
       fontSize: {
-        'heading-xl': ['56px', { lineHeight: '1', letterSpacing: '-0.02em' }],
+        // Design token system - matches Canva specifications
+        'heading-xl': ['56px', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '900' }],
         'heading-lg': ['40px', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
         'heading-md': ['32px', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-        body: ['14px', { lineHeight: '1.5' }],
-        subheading: ['14px', { lineHeight: '1.5', fontWeight: '700' }],
+        'body': ['14px', { lineHeight: '1.5' }],
+        'subheading': ['14px', { lineHeight: '1.5', fontWeight: '700' }],
+      },
+      spacing: {
+        'btn-blue-w': '500px',
+        'btn-blue-h': '55px',
+        'btn-red-w': '225px',
+        'btn-red-h': '55px',
       },
     },
   },

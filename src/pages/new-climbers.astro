@@ -1,0 +1,723 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewClimberSafetyAccordion from '../components/NewClimberSafetyAccordion.tsx';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const newClimbersPathCandidates = [
+  path.join(process.cwd(), 'src/content/pages/new-climbers.json'),
+  path.join(process.cwd(), 'src/content/pages/new-climbers/index.json'),
+];
+const newClimbersPath =
+  newClimbersPathCandidates.find((candidatePath) => fs.existsSync(candidatePath)) ||
+  newClimbersPathCandidates[0];
+
+let newClimbersPage: {
+  hero?: {
+    headline?: string;
+    backgroundImage?: string;
+    backgroundImageLibraryPath?: string;
+  };
+  welcome?: {
+    headline?: string;
+    paragraphs?: string[];
+    image?: string;
+    imageLibraryPath?: string;
+  };
+  dayPass?: {
+    headline?: string;
+    price?: string;
+    gearText?: string;
+    paragraphs?: string[];
+    hoursTitle?: string;
+    hoursText?: string[];
+    image?: string;
+    imageLibraryPath?: string;
+  };
+  activitiesHeadline?: string;
+  activitiesIntro?: string;
+  activityCards?: {
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    buttonLink?: string;
+    image?: string;
+    imageLibraryPath?: string;
+    imageAlt?: string;
+  }[];
+};
+
+const newClimberFallback: {
+  hero: {
+    headline: string;
+    backgroundImage: string;
+    backgroundImageLibraryPath?: string;
+  };
+  welcome: {
+    headline: string;
+    paragraphs: string[];
+    image: string;
+    imageLibraryPath?: string;
+  };
+  dayPass: {
+    headline: string;
+    price: string;
+    gearText: string;
+    paragraphs: string[];
+    hoursTitle: string;
+    hoursText: string[];
+    image: string;
+    imageLibraryPath?: string;
+  };
+  activitiesHeadline: string;
+  activitiesIntro: string;
+  activityCards: {
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    image: string;
+    imageLibraryPath?: string;
+    imageAlt: string;
+  }[];
+} = {
+  hero: {
+    headline: 'NEW CLIMBERS',
+    backgroundImage: '/images/canva-final/newclimbers-hero-photo.jpg',
+  },
+  welcome: {
+    headline: 'HI, WELCOME IN!',
+    paragraphs: [
+      "Never been here before? We're so glad you found us!",
+      'The Knot is a locally owned climbing gym in Gainesville, Florida that strives to cultivate a community-centered approach to fitness.',
+      'Check out our video to learn more about our facility and getting started on the wall or swing by to chat with our staff!',
+    ],
+    image: '/images/canva-final/newclimbers-welcome.jpg',
+  },
+  dayPass: {
+    headline: 'DAY PASSES',
+    price: '$25',
+    gearText: '+ GEAR',
+    paragraphs: [
+      'Although we are primarily a members-focused gym, we offer day passes during limited hours.',
+      "If you don't have your own gear, you can rent ours for $5 extra; includes chalk, shoes, & a harness if you're belay certified.",
+    ],
+    hoursTitle: 'DAY PASS HOURS',
+    hoursText: [
+      'Day passes are only sold Monday through Friday from 10AM - 3PM.',
+      'Must be purchased at the front desk - come check us out!',
+    ],
+    image: '/images/canva-final/newclimbers-daypass-1440.jpg',
+  },
+  activitiesHeadline: 'ACTIVITIES',
+  activitiesIntro: 'Never climbed before? No problem! Our facility offers multiple types of climbing activities and our staff is here to help you get started.',
+  activityCards: [
+    {
+      title: 'BOULDERING',
+      description: 'No ropes needed! Climb shorter walls with padded floors beneath you.',
+      buttonText: 'INTRO CLASS',
+      buttonLink: 'https://portal.climbtheknot.com/gnv/services/intro-class',
+      image: '/images/canva-final/home-card-intro-climbing.jpg',
+      imageAlt: 'Climber getting started on the wall',
+    },
+    {
+      title: 'TOP-ROPE CLIMBING',
+      description: 'Climb higher with the safety of a rope and belay system.',
+      buttonText: 'PRIVATE BELAYER',
+      buttonLink: 'https://portal.climbtheknot.com/gnv/services/private-belayer',
+      image: '/images/canva-final/home-card-private-belayer.jpg',
+      imageAlt: 'Private belayer support session',
+    },
+    {
+      title: 'CLASSES',
+      description: 'Learn the fundamentals with our experienced instructors.',
+      buttonText: 'SCHEDULE',
+      buttonLink: 'https://portal.climbtheknot.com/gnv/calendar',
+      image: '/images/canva-final/home-card-day-passes.jpg',
+      imageAlt: 'Climbers during gym activities',
+    },
+  ],
+};
+
+try {
+  newClimbersPage = JSON.parse(fs.readFileSync(newClimbersPath, 'utf-8'));
+} catch {
+  newClimbersPage = newClimberFallback;
+}
+
+const toPublicUrl = (libraryPath?: string) =>
+  libraryPath && libraryPath.startsWith('public/')
+    ? `/${libraryPath.slice('public/'.length)}`
+    : undefined;
+
+const heroContent = newClimbersPage.hero || newClimberFallback.hero;
+const welcomeContent = newClimbersPage.welcome || newClimberFallback.welcome;
+const dayPassContent = newClimbersPage.dayPass || newClimberFallback.dayPass;
+const heroImage =
+  toPublicUrl(heroContent.backgroundImageLibraryPath) ||
+  heroContent.backgroundImage ||
+  '/images/canva-final/newclimbers-hero-photo.jpg';
+const welcomeImage =
+  toPublicUrl(welcomeContent.imageLibraryPath) ||
+  welcomeContent.image ||
+  '/images/canva-final/newclimbers-welcome.jpg';
+const dayPassImage =
+  toPublicUrl(dayPassContent.imageLibraryPath) ||
+  dayPassContent.image ||
+  '/images/canva-final/newclimbers-daypass-1440.jpg';
+const welcomeParagraphs =
+  Array.isArray(welcomeContent.paragraphs) && welcomeContent.paragraphs.length > 0
+    ? welcomeContent.paragraphs
+    : newClimberFallback.welcome.paragraphs;
+const dayPassParagraphs =
+  Array.isArray(dayPassContent.paragraphs) && dayPassContent.paragraphs.length > 0
+    ? dayPassContent.paragraphs
+    : newClimberFallback.dayPass.paragraphs;
+const dayPassHours =
+  Array.isArray(dayPassContent.hoursText) && dayPassContent.hoursText.length > 0
+    ? dayPassContent.hoursText
+    : newClimberFallback.dayPass.hoursText;
+const activitiesHeadline = newClimbersPage.activitiesHeadline || newClimberFallback.activitiesHeadline;
+const activitiesIntro = newClimbersPage.activitiesIntro || newClimberFallback.activitiesIntro;
+const activitiesCards =
+  Array.isArray(newClimbersPage.activityCards) && newClimbersPage.activityCards.length > 0
+    ? newClimbersPage.activityCards.map((card) => ({
+        title: card.title || '',
+        description: card.description || '',
+        buttonText: card.buttonText || 'LEARN MORE',
+        buttonHref: card.buttonLink || '#',
+        imageSrc:
+          toPublicUrl(card.imageLibraryPath) ||
+          card.image ||
+          '/images/canva-final/canva-hills-background.jpg',
+        imageAlt: card.imageAlt || card.buttonText || 'Activity card image',
+      }))
+    : newClimberFallback.activityCards.map((card) => ({
+        title: card.title,
+        description: card.description,
+        buttonText: card.buttonText,
+        buttonHref: card.buttonLink,
+        imageSrc: card.image,
+        imageAlt: card.imageAlt,
+      }));
+
+---
+
+<BaseLayout title="New Climbers">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-video-background">
+      <img
+        src={heroImage}
+        srcset={`${heroImage} 1600w, ${heroImage} 2400w`}
+        sizes="100vw"
+        alt="New climbers hero image"
+        class="hero-video"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        width="1600"
+        height="1067"
+      />
+      <div class="hero-video-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-headline">{heroContent.headline || 'NEW CLIMBERS'}</h1>
+    </div>
+  </section>
+
+  <!-- Welcome Section -->
+  <section class="welcome-section">
+    <div class="welcome-grid">
+      <div class="welcome-copy">
+        <h2 class="welcome-title">{welcomeContent.headline || 'HI, WELCOME IN!'}</h2>
+        {welcomeParagraphs.map((paragraph) => (
+          <p class="welcome-text">{paragraph}</p>
+        ))}
+      </div>
+      <div class="welcome-media">
+        <img
+          src={welcomeImage}
+          alt="Climbing wall hold close-up"
+          class="welcome-image"
+          loading="lazy"
+          decoding="async"
+          width="1280"
+          height="720"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Day Pass Pricing Section -->
+  <section class="day-pass-section" id="day-passes">
+    <div class="day-pass-content">
+      <div class="day-pass-image">
+        <div class="facility-photo">
+          <img
+            src={dayPassImage}
+            alt="Climbers at The Knot facility"
+            class="facility-image"
+            loading="lazy"
+            decoding="async"
+            width="1440"
+            height="960"
+          />
+        </div>
+      </div>
+      <div class="day-pass-info">
+        <h2 class="day-pass-title">{dayPassContent.headline || 'DAY PASSES'}</h2>
+        <p class="day-pass-price"><span class="price-amount">{dayPassContent.price || '$25'}</span> {dayPassContent.gearText || '+ GEAR'}</p>
+        {dayPassParagraphs.map((paragraph) => (
+          <p class="day-pass-copy">{paragraph}</p>
+        ))}
+        <h3 class="day-pass-hours-title">{dayPassContent.hoursTitle || 'DAY PASS HOURS'}</h3>
+        {dayPassHours.map((line) => (
+          <p class="day-pass-copy">{line}</p>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Activities 3-Card Section -->
+  <section class="activities-section">
+    <div class="activities-wrapper">
+      <h2 class="activities-heading">{activitiesHeadline}</h2>
+      <p class="activities-intro">{activitiesIntro}</p>
+      <div class="activities-grid">
+        {activitiesCards.map((card) => (
+          <div class="activity-card">
+            <img
+              src={card.imageSrc}
+              alt={card.imageAlt}
+              class="activity-card__image"
+              loading="lazy"
+              decoding="async"
+              width="800"
+              height="533"
+            />
+            <div class="activity-card__body">
+              {card.title && <h3 class="activity-card__title">{card.title}</h3>}
+              {card.description && <p class="activity-card__description">{card.description}</p>}
+            </div>
+            <a
+              href={card.buttonHref}
+              class="activity-card__button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {card.buttonText}
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Safety & Etiquette Accordions -->
+  <section class="safety-section">
+    <div class="safety-wrapper">
+      <h2 class="safety-heading">GYM TIPS & CLIMBING INFO</h2>
+      <NewClimberSafetyAccordion client:visible />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-section {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(180, 60, 60, 0.5);
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: absolute;
+    right: 5%;
+    bottom: 12%;
+    z-index: 2;
+    text-align: right;
+  }
+
+  .hero-headline {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 72px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Welcome Section */
+  .welcome-section {
+    background-color: #000;
+    padding: 60px 48px;
+  }
+
+  .welcome-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .welcome-title {
+    margin: 0 0 20px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .welcome-text {
+    margin: 0 0 16px;
+    color: #efefef;
+    font-family: var(--font-body);
+    font-size: 20px;
+    line-height: 1.45;
+    font-style: normal;
+  }
+
+  .welcome-media {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .welcome-image {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  /* Day Pass Section */
+  .day-pass-section {
+    background-color: #000;
+    padding: 80px 48px;
+  }
+
+  .day-pass-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .day-pass-image {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .facility-photo {
+    position: relative;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .facility-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .day-pass-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: #fff;
+  }
+
+  .day-pass-title {
+    margin: 0 0 8px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(42px, 5.5vw, 78px);
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .day-pass-price {
+    margin: 0 0 18px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(34px, 4vw, 56px);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .price-amount {
+    font-family: var(--font-heading);
+    font-size: inherit;
+    font-weight: 700;
+    color: var(--color-manatee, #84BABF);
+  }
+
+  .day-pass-copy {
+    margin: 0 0 12px;
+    color: #ececec;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    font-style: normal;
+  }
+
+  .day-pass-hours-title {
+    margin: 16px 0 8px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  /* Activities Section */
+  .activities-section {
+    background-color: #000;
+    padding: 60px 0 80px 0;
+  }
+
+  .activities-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .activities-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 16px;
+    line-height: 1;
+  }
+
+  .activities-intro {
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.6;
+    color: #ececec;
+    text-align: center;
+    margin: 0 auto 40px;
+    max-width: 700px;
+  }
+
+  .activities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .activity-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--color-graphite, #39393B);
+  }
+
+  .activity-card__image {
+    width: 100%;
+    aspect-ratio: 4/3;
+    display: block;
+    object-fit: cover;
+  }
+
+  .activity-card__body {
+    padding: 16px 20px 12px;
+    flex: 1;
+  }
+
+  .activity-card__title {
+    margin: 0 0 6px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+
+  .activity-card__description {
+    margin: 0;
+    color: #ccc;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .activity-card__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    background-color: var(--color-manatee, #84BABF);
+    color: #000;
+    font-family: var(--font-heading, 'Uniform Pro', sans-serif);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: opacity 0.2s ease;
+    margin-top: auto;
+  }
+
+  .activity-card__button:hover {
+    opacity: 0.9;
+  }
+
+  /* Safety Section */
+  .safety-section {
+    background-color: #000;
+    padding: 60px 0 0 0;
+  }
+
+  .safety-wrapper {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .safety-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 32px;
+    padding: 0 48px;
+    line-height: 1;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-section {
+      min-height: 400px;
+    }
+
+    .hero-content {
+      left: 24px;
+      right: 24px;
+      transform: none;
+      text-align: center;
+      bottom: 10%;
+    }
+
+    .hero-headline {
+      font-size: 42px;
+    }
+
+    .welcome-section {
+      padding: 32px 24px;
+    }
+
+    .welcome-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .welcome-title {
+      font-size: 46px;
+    }
+
+    .welcome-text {
+      font-size: 18px;
+    }
+
+    .day-pass-section {
+      padding: 48px 24px;
+    }
+
+    .day-pass-content {
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .day-pass-info {
+      align-items: center;
+      text-align: center;
+    }
+
+    .day-pass-hours-title {
+      margin-top: 12px;
+    }
+
+    .activities-section {
+      padding: 40px 0 48px 0;
+    }
+
+    .activities-wrapper {
+      padding: 0 24px;
+    }
+
+    .activities-heading {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .activities-intro {
+      font-size: 16px;
+      margin-bottom: 32px;
+    }
+
+    .activities-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .safety-section {
+      padding: 40px 0 0 0;
+    }
+
+    .safety-heading {
+      font-size: 32px;
+      margin-bottom: 24px;
+      padding: 0 24px;
+    }
+  }
+</style>

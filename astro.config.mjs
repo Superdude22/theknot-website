@@ -19,4 +19,16 @@ export default defineConfig({
     tailwind(),
     keystatic(),
   ],
+  image: {
+    // Enable modern image formats
+    format: ['avif', 'webp'],
+    // Quality settings for optimization
+    quality: 80,
+  },
+  vite: {
+    build: {
+      // Enable CSS code splitting
+      cssCodeSplit: true,
+    },
+  },
 });

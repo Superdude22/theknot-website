@@ -5,5 +5,7 @@
   "description": "Our annual spring climbing competition featuring competitive and casual divisions. Register early for the best experience!",
   "registrationLink": "https://portal.climbtheknot.com/gnv/events/event-4",
   "isFeatured": false,
-  "isRecurring": false
+  "isRecurring": false,
+  "image": "/images/canva-final/event-4/canva-hills-background.jpg",
+  "imageLibraryPath": "public/images/canva-final/event-4/canva-hills-background.jpg"
 }

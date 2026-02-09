@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   const events = await getCollection('events');
@@ -10,15 +10,18 @@ export async function getStaticPaths() {
   }));
 }
 
-const { slug } = Astro.params;
 const { event } = Astro.props;
 
 if (!event) {
-  return Astro.redirect('/404');
+  throw new Error('Event content missing for /events/[slug].');
 }
 
 const eventData = event.data;
 const eventTitle = eventData.title;
+const eventImage =
+  (eventData.imageLibraryPath && eventData.imageLibraryPath.startsWith('public/')
+    ? `/${eventData.imageLibraryPath.slice('public/'.length)}`
+    : undefined) || eventData.image;
 
 function formatDate(dateString: string | undefined): string {
   if (!dateString) return 'Date TBD';
@@ -38,8 +41,8 @@ const hasRegistration = !!eventData.registrationLink;
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-background">
-      {eventData.image ? (
-        <img src={eventData.image} alt={eventTitle} />
+      {eventImage ? (
+        <img src={eventImage} alt={eventTitle} loading="eager" fetchpriority="high" decoding="async" />
       ) : (
         <svg
           viewBox="0 0 1200 400"
@@ -104,7 +107,7 @@ const hasRegistration = !!eventData.registrationLink;
 
           <div class="info-item">
             <span class="info-label">Location</span>
-            <span class="info-value">The Knot Climbing Gym<br />619 S Main St<br />Gainesville, FL 32601</span>
+            <span class="info-value">The Knot Climbing Gym<br />{eventData.address ? eventData.address : '619 S Main St, Gainesville, FL 32601'}</span>
           </div>
 
           {hasRegistration && (
@@ -122,10 +125,81 @@ const hasRegistration = !!eventData.registrationLink;
     </div>
   </section>
 
+  <!-- Optional Extended Sections -->
+  {eventData.competitionDivisions && eventData.competitionDivisions.length > 0 && (
+    <section class="extended-section">
+      <div class="extended-container">
+        <h2 class="extended-heading">DIVISIONS</h2>
+        <div class="divisions-grid">
+          {eventData.competitionDivisions.map((div: { name: string; description?: string }) => (
+            <div class="division-card">
+              <h3 class="division-name">{div.name}</h3>
+              {div.description && <p class="division-description">{div.description}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {eventData.schedule && eventData.schedule.length > 0 && (
+    <section class="extended-section">
+      <div class="extended-container">
+        <h2 class="extended-heading">SCHEDULE</h2>
+        <div class="schedule-list">
+          {eventData.schedule.map((item: { time: string; activity: string }) => (
+            <div class="schedule-item">
+              <span class="schedule-time">{item.time}</span>
+              <span class="schedule-activity">{item.activity}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {eventData.faqItems && eventData.faqItems.length > 0 && (
+    <section class="extended-section">
+      <div class="extended-container">
+        <h2 class="extended-heading">FAQ</h2>
+        <div class="faq-list">
+          {eventData.faqItems.map((faq: { question: string; answer: string }) => (
+            <div class="faq-item">
+              <h3 class="faq-question">{faq.question}</h3>
+              <p class="faq-answer">{faq.answer}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {eventData.merchandise && eventData.merchandise.length > 0 && (
+    <section class="extended-section">
+      <div class="extended-container">
+        <h2 class="extended-heading">MERCHANDISE</h2>
+        <div class="merch-grid">
+          {eventData.merchandise.map((item: { name: string; description?: string; price?: string; preorderLink?: string }) => (
+            <div class="merch-card">
+              <h3 class="merch-name">{item.name}</h3>
+              {item.description && <p class="merch-description">{item.description}</p>}
+              {item.price && <p class="merch-price">{item.price}</p>}
+              {item.preorderLink && (
+                <a href={item.preorderLink} target="_blank" rel="noopener noreferrer" class="merch-link">
+                  PRE-ORDER NOW
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <!-- Back to Events -->
   <section class="back-section">
     <a href="/events" class="back-link">
-      ← Back to All Events
+      &larr; Back to All Events
     </a>
   </section>
 </BaseLayout>
@@ -356,6 +430,186 @@ const hasRegistration = !!eventData.registrationLink;
   .back-link:hover {
     opacity: 0.8;
     text-decoration: underline;
+  }
+
+  /* Extended Sections (Divisions, Schedule, FAQ, Merchandise) */
+  .extended-section {
+    padding: 48px 5%;
+    background: #000;
+  }
+
+  .extended-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .extended-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 3.6vw, 40px);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 24px 0;
+  }
+
+  /* Divisions */
+  .divisions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .division-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .division-name {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: #84babf;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px 0;
+  }
+
+  .division-description {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: #ddd;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Schedule */
+  .schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .schedule-item {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .schedule-item:last-child {
+    border-bottom: none;
+  }
+
+  .schedule-time {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    color: #84babf;
+    min-width: 100px;
+    text-transform: uppercase;
+  }
+
+  .schedule-activity {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: #fff;
+  }
+
+  /* FAQ */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .faq-item {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .faq-question {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0 0 8px 0;
+  }
+
+  .faq-answer {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: #ddd;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Merchandise */
+  .merch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .merch-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .merch-name {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .merch-description {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: #ddd;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .merch-price {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: #84babf;
+    margin: 0;
+  }
+
+  .merch-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-rust);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 0;
+    transition: opacity 0.2s ease;
+    width: fit-content;
+  }
+
+  .merch-link:hover {
+    opacity: 0.9;
   }
 
   /* Mobile Responsive */

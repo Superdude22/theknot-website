@@ -1,252 +1,240 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Accordion from '../../components/Accordion.tsx';
+import { getCollection } from 'astro:content';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const events = [
-  {
-    id: 'event-1',
-    title: 'EVENT 1',
-    date: 'DATE',
-    time: '6:00 PM - 9:00 PM',
-    description: 'Join us for an exciting evening event at The Knot. Perfect for climbers of all skill levels looking to connect with the community.',
-    address: '619 S Main St',
-    hasRegistration: true,
-    registrationUrl: 'https://portal.climbtheknot.com/gnv/events/event-1',
-  },
-  {
-    id: 'event-2',
-    title: 'EVENT 2',
-    date: 'DATE',
-    time: '2:00 PM - 6:00 PM',
-    description: 'Info and stuff about event. What do the people need to know',
-    address: '619 S Main St',
-    hasRegistration: true,
-    registrationUrl: 'https://portal.climbtheknot.com/gnv/events/event-2',
-  },
-  {
-    id: 'event-3',
-    title: 'EVENT 3',
-    date: 'DATE',
-    time: '10:00 AM - 4:00 PM',
-    description: 'Youth climbing day with special programming for young climbers. Parents welcome to participate!',
-    address: '619 S Main St',
-    hasRegistration: false,
-  },
-  {
-    id: 'event-4',
-    title: 'EVENT 4',
-    date: 'DATE',
-    time: 'All Day',
-    description: 'Our annual spring climbing competition featuring competitive and casual divisions. Register early for the best experience!',
-    address: '619 S Main St',
-    hasRegistration: true,
-    registrationUrl: 'https://portal.climbtheknot.com/gnv/events/event-4',
-  },
-  {
-    id: 'event-5',
-    title: 'EVENT 5',
-    date: 'DATE',
-    time: '7:00 PM - 10:00 PM',
-    description: 'Evening social climb with live music and refreshments. A great way to end your week!',
-    address: '619 S Main St',
-    hasRegistration: false,
-  },
-];
+const hillsPlaceholder = '/images/canva-final/canva-hills-background.jpg';
+const redpointEventsUrl = 'https://portal.climbtheknot.com/gnv/events';
 
-const accordionItems = [
+// Load business info for events email
+let eventsEmail = 'events@climbtheknot.com';
+try {
+  const biPath = path.join(process.cwd(), 'src/content/business-info.json');
+  const raw = fs.readFileSync(biPath, 'utf-8');
+  const parsed = JSON.parse(raw);
+  if (parsed?.contact?.eventsEmail) eventsEmail = parsed.contact.eventsEmail;
+} catch (e) {
+  // Use default
+}
+
+function parseDate(value?: string): Date | null {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDate(value?: string): string {
+  const parsed = parseDate(value);
+  if (!parsed) return 'Date TBD';
+  return parsed.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+const allEvents = (await getCollection('events')).sort((left, right) => {
+  const leftDate = parseDate(left.data.date);
+  const rightDate = parseDate(right.data.date);
+
+  if (!leftDate && !rightDate) return 0;
+  if (!leftDate) return 1;
+  if (!rightDate) return -1;
+  return leftDate.getTime() - rightDate.getTime();
+});
+
+const now = new Date();
+now.setHours(0, 0, 0, 0);
+
+const upcomingEvents = allEvents.filter((event) => {
+  const eventDate = parseDate(event.data.date);
+  return !eventDate || eventDate.getTime() >= now.getTime();
+});
+
+const pastEvents = allEvents.filter((event) => {
+  const eventDate = parseDate(event.data.date);
+  return !!eventDate && eventDate.getTime() < now.getTime();
+});
+
+const featuredEvent =
+  upcomingEvents.find((event) => event.data.isFeatured) ??
+  upcomingEvents[0] ??
+  allEvents[0] ??
+  null;
+
+const toPublicUrl = (libraryPath?: string) =>
+  libraryPath && libraryPath.startsWith('public/')
+    ? `/${libraryPath.slice('public/'.length)}`
+    : undefined;
+
+const eventImage = (event: (typeof allEvents)[number]) =>
+  toPublicUrl(event.data.imageLibraryPath) || event.data.image || hillsPlaceholder;
+
+const eventTypeItems = [
   {
     title: 'BOULDERING ONLY',
-    content: 'Bouldering is climbing without ropes on shorter walls (typically 10-15 feet) with thick crash pads below. It\'s a great way to start climbing as it requires no partner or equipment knowledge.',
+    content:
+      'Bouldering is climbing without ropes on shorter walls with thick crash pads below. Great for first-time climbers and larger group events.',
   },
   {
     title: 'TOP ROPE + BOULDERING',
-    content: 'Top rope climbing involves climbing with a rope that runs through an anchor at the top of the wall. A belayer manages the rope from below, catching falls and lowering the climber.',
+    content:
+      'Top rope events include harnesses and rope climbing lanes in addition to bouldering zones. Belay support requirements depend on group size.',
   },
   {
     title: 'STAFF BELAY',
-    content: 'Don\'t have a climbing partner or belay certification? No problem! Our staff belay service provides experienced belayers who can help you climb our top rope routes.',
+    content:
+      'Need belayers? The Knot can provide trained staff belayers for private and corporate events when scheduled in advance.',
   },
   {
     title: 'YOGA OR FITNESS CLASS',
-    content: 'Complement your climbing training with our yoga and fitness classes designed specifically for climbers. Improve flexibility, core strength, and recovery.',
+    content:
+      'Add yoga or fitness sessions to your event package. Availability depends on instructor schedules and gym staffing.',
   },
   {
     title: 'BELAY CLASS',
-    content: 'Learn to belay and open up the full potential of the gym! Our belay certification class teaches you the skills to safely manage the rope for a climbing partner.',
+    content:
+      'Belay classes can be added for groups that want certification as part of the event experience.',
   },
   {
     title: 'KIDS POLICIES',
-    content: 'Children under 14 must be accompanied by a supervising adult at all times. Youth climbers (14-17) may climb independently after completing an orientation.',
+    content:
+      'Youth participants must follow age and supervision requirements. Contact staff for current youth policy details before booking.',
   },
 ];
 ---
 
 <BaseLayout title="Events">
-  <!-- Hero Section -->
   <section class="hero-section">
-    <div class="hero-background">
-      <img
-        src="/images/events/hero-design-slide.png"
-        alt="Events hero background"
-      />
-    </div>
-    <div class="hero-content">
-      <h1 class="hero-headline">EVENTS</h1>
-    </div>
-    <div class="hero-video-placeholder">
-      <div class="video-box">
-        <span class="video-label">Video of gym tour</span>
-      </div>
-    </div>
+    <img src={hillsPlaceholder} alt="" class="hero-bg" loading="eager" fetchpriority="high" decoding="async" />
+    <h1 class="hero-title">EVENTS</h1>
   </section>
 
-  <!-- Featured Event Section -->
-  <section class="featured-section">
-    <div class="featured-container">
-      <div class="featured-main">
-        <a
-          href="https://portal.climbtheknot.com/gnv/events"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="featured-button"
-        >
+  <section class="next-event-section">
+    <div class="next-event-grid">
+      <div class="next-event-main">
+        <h2 class="section-title">OUR NEXT EVENT</h2>
+        {featuredEvent ? (
+          <>
+            <h3 class="event-title">{featuredEvent.data.title}</h3>
+            <p class="event-meta">{formatDate(featuredEvent.data.date)} {featuredEvent.data.time ? `| ${featuredEvent.data.time}` : ''}</p>
+            <p class="event-description">{featuredEvent.data.description ?? 'Details coming soon.'}</p>
+          </>
+        ) : (
+          <p class="event-description">No upcoming events posted yet.</p>
+        )}
+
+        <a href={redpointEventsUrl} target="_blank" rel="noopener noreferrer" class="btn-secondary next-event-button">
           REGISTRATION & MORE INFO
         </a>
       </div>
-      <div class="featured-marketing">
-        <div class="marketing-placeholder">
-          <svg
-            viewBox="0 0 300 200"
-            preserveAspectRatio="xMidYMid slice"
-            style="width: 100%; height: 100%;"
-          >
-            <defs>
-              <linearGradient id="marketingSkyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#D6EEF5" />
-                <stop offset="100%" stop-color="#87CEEB" />
-              </linearGradient>
-            </defs>
-            <rect width="300" height="200" fill="url(#marketingSkyGrad)" />
-            <ellipse cx="60" cy="35" rx="35" ry="20" fill="white" opacity="0.9" />
-            <ellipse cx="90" cy="40" rx="30" ry="18" fill="white" opacity="0.9" />
-            <ellipse cx="220" cy="45" rx="40" ry="22" fill="white" opacity="0.9" />
-            <path d="M0 200 Q150 100 300 200 Z" fill="#8FB339" />
-            <path d="M0 200 Q100 130 200 200 Z" fill="#5C8A2B" />
-          </svg>
-          <div class="placeholder-label">Event marketing</div>
+
+      <img
+        src={featuredEvent ? eventImage(featuredEvent) : hillsPlaceholder}
+        alt={featuredEvent?.data.title || 'Event preview'}
+        class="next-event-image"
+      />
+    </div>
+  </section>
+
+  <section class="calendar-section">
+    <h2 class="section-title">EVENT CALENDAR</h2>
+    <p class="section-subtext">We host events almost every month. Click any event to learn more.</p>
+
+    <div class="calendar-grid">
+      {upcomingEvents.length > 0 ? (
+        upcomingEvents.map((event) => (
+          <a href={`/events/${event.id}`} class="calendar-card">
+            <img src={eventImage(event)} alt={event.data.title} class="calendar-card-image" loading="lazy" decoding="async" />
+            <div class="calendar-card-body">
+              <h3 class="calendar-card-title">{event.data.title}</h3>
+              <p class="calendar-card-date">{formatDate(event.data.date)}</p>
+            </div>
+          </a>
+        ))
+      ) : (
+        <p class="calendar-empty">No upcoming events yet.</p>
+      )}
+    </div>
+  </section>
+
+  {featuredEvent && (
+    <section class="spotlight-section">
+      <div class="spotlight-card">
+        <img src={eventImage(featuredEvent)} alt={featuredEvent.data.title} class="spotlight-image" loading="lazy" decoding="async" />
+        <div class="spotlight-content">
+          <h2 class="section-title">{featuredEvent.data.title}</h2>
+          <p class="spotlight-date">{formatDate(featuredEvent.data.date)} {featuredEvent.data.time ? `| ${featuredEvent.data.time}` : ''}</p>
+          <p class="spotlight-description">{featuredEvent.data.description ?? 'Details coming soon.'}</p>
+          <a href={`/events/${featuredEvent.id}`} class="btn-primary">REGISTRATION</a>
+          <p class="spotlight-address">ADDRESS<br />619 S Main St</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
-  <!-- Event Grid Section -->
-  <section class="events-grid-section">
-    <div class="events-grid">
-      {events.map((event, index) => (
-        <div class="event-card" data-event={JSON.stringify(event)}>
-          <div class="event-image">
-            <svg
-              viewBox="0 0 280 200"
-              preserveAspectRatio="xMidYMid slice"
-              style="width: 100%; height: 100%;"
-            >
-              <defs>
-                <linearGradient id={`eventSkyGrad-${index}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#D6EEF5" />
-                  <stop offset="100%" stop-color="#87CEEB" />
-                </linearGradient>
-              </defs>
-              <rect width="280" height="200" fill={`url(#eventSkyGrad-${index})`} />
-              <ellipse cx="50" cy="35" rx="30" ry="18" fill="white" opacity="0.9" />
-              <ellipse cx="80" cy="40" rx="25" ry="15" fill="white" opacity="0.9" />
-              <ellipse cx="210" cy="40" rx="35" ry="20" fill="white" opacity="0.9" />
-              <path d="M0 200 Q140 100 280 200 Z" fill="#8FB339" />
-              <path d="M0 200 Q90 130 180 200 Z" fill="#5C8A2B" />
-            </svg>
-          </div>
-          <div class="event-info">
-            <h3 class="event-title">{event.title}</h3>
-            <p class="event-date">{event.date}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-    <p class="grid-note">Click card → opens pop-up for smaller events, or routes to event page for larger events (like competitions)</p>
-  </section>
-
-  <!-- Event Types Accordion Section -->
-  <section class="accordion-section">
-    <Accordion items={accordionItems} client:visible />
-  </section>
-
-  <!-- Event Request Buttons Section -->
-  <section class="request-section">
-    <div class="request-buttons">
+  <section class="group-events-section">
+    <h2 class="section-title">GROUP EVENTS</h2>
+    <p class="section-subtext">Host your next event with The Knot!</p>
+    <h3 class="group-subtitle">EVENT TYPES & PRICING</h3>
+    <Accordion items={eventTypeItems} client:visible />
+    <p class="group-footnote">
+      Group events must be scheduled at least three weeks in advance. Fill out our inquiry form or shoot us an email to learn more.
+      Group event scheduling is subject to gym and staff availability.
+    </p>
+    <div class="group-buttons">
       <a
         href="https://form.asana.com/?k=event-request"
         target="_blank"
         rel="noopener noreferrer"
-        class="request-button"
+        class="btn-secondary"
       >
         EVENT REQUEST FORM
       </a>
-      <a
-        href="mailto:tully@climbtheknot.com"
-        class="request-button"
-      >
-        CONTACT US
-      </a>
+      <a href={`mailto:${eventsEmail}`} class="btn-primary">CONTACT US</a>
     </div>
   </section>
 
-  <!-- Up ENDing Parkinsons Section -->
   <section class="upending-section">
-    <div class="upending-container">
-      <div class="upending-text">
-        <a
-          href="https://upendingparkinsons.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="upending-link"
-        >
-          Up ENDing Parkinsons
+    <div class="upending-grid">
+      <div>
+        <h2 class="section-title">UPENDING PARKINSONS</h2>
+        <p class="event-description">
+          The Knot is partnering with Up ENDing Parkinsons to provide guided climbing sessions for people living with Parkinson&apos;s Disease.
+          Anyone living with PD is welcome to climb, and family members are encouraged to join.
+        </p>
+        <p class="event-description"><strong>WEDNESDAYS 10AM - 11:30AM</strong></p>
+        <p class="event-description">
+          Admission, instruction, and rental gear are provided free of charge. No experience is required.
+        </p>
+        <a href="https://upendingparkinsons.org/" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          REGISTER HERE
         </a>
       </div>
-      <div class="upending-image">
-        <svg
-          viewBox="0 0 400 250"
-          preserveAspectRatio="xMidYMid slice"
-          style="width: 100%; height: 100%;"
-        >
-          <defs>
-            <linearGradient id="upendingSkyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#D6EEF5" />
-              <stop offset="100%" stop-color="#87CEEB" />
-            </linearGradient>
-          </defs>
-          <rect width="400" height="250" fill="url(#upendingSkyGrad)" />
-          <ellipse cx="70" cy="40" rx="40" ry="24" fill="white" opacity="0.9" />
-          <ellipse cx="110" cy="45" rx="35" ry="20" fill="white" opacity="0.9" />
-          <ellipse cx="310" cy="50" rx="45" ry="26" fill="white" opacity="0.9" />
-          <path d="M0 250 Q200 100 400 250 Z" fill="#8FB339" />
-          <path d="M0 250 Q130 150 260 250 Z" fill="#5C8A2B" />
-        </svg>
-        <div class="upending-label">UpEnding picture</div>
-      </div>
+      <img src={hillsPlaceholder} alt="Event placeholder hills background" class="upending-image" loading="lazy" decoding="async" />
     </div>
   </section>
 
-  <!-- Register Here CTA -->
-  <section class="register-cta-section">
-    <a
-      href="https://portal.climbtheknot.com/gnv/events"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="register-cta-button"
-    >
-      REGISTER HERE
-    </a>
-  </section>
+  {pastEvents.length > 0 && (
+    <section class="past-events-section">
+      <details>
+        <summary class="section-title past-events-summary">PAST EVENTS ({pastEvents.length})</summary>
+        <div class="calendar-grid">
+          {pastEvents.map((event) => (
+            <a href={`/events/${event.id}`} class="calendar-card calendar-card--past">
+              <img src={eventImage(event)} alt={event.data.title} class="calendar-card-image" loading="lazy" decoding="async" />
+              <div class="calendar-card-body">
+                <h3 class="calendar-card-title">{event.data.title}</h3>
+                <p class="calendar-card-date">{formatDate(event.data.date)}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </details>
+    </section>
+  )}
 </BaseLayout>
 
 <style>
@@ -257,408 +245,255 @@ const accordionItems = [
     overflow: hidden;
   }
 
-  .hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-
-  .hero-background img {
+  .hero-bg {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: bottom;
+    display: block;
   }
 
-  .hero-content {
+  .hero-title {
     position: absolute;
-    bottom: 20%;
-    right: 10%;
-    text-align: right;
-  }
-
-  .hero-headline {
-    font-family: var(--font-heading);
-    font-size: 64px;
-    font-weight: 900;
-    color: white;
-    text-transform: uppercase;
+    right: 5%;
+    bottom: 24px;
     margin: 0;
-    letter-spacing: 2px;
-    text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   }
 
-  .hero-video-placeholder {
-    position: absolute;
-    top: 15%;
-    right: 10%;
+  .next-event-section,
+  .calendar-section,
+  .spotlight-section,
+  .group-events-section,
+  .upending-section,
+  .past-events-section {
+    padding: 48px 24px;
+    background: #000;
   }
 
-  .video-box {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px 30px;
-    border: 3px solid var(--color-graphite);
+  .calendar-section,
+  .spotlight-section {
+    background: #fff;
   }
 
-  .video-label {
+  .section-title {
+    margin: 0 0 12px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 3.6vw, 44px);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .calendar-section .section-title,
+  .spotlight-section .section-title {
+    color: #000;
+  }
+
+  .section-subtext {
+    margin: 0 0 20px;
+    color: #ddd;
     font-family: var(--font-body);
     font-size: 14px;
-    font-weight: 500;
-    color: var(--color-graphite);
-    text-transform: uppercase;
+    line-height: 1.5;
   }
 
-  /* Featured Section */
-  .featured-section {
-    padding: 60px 5%;
-    background: var(--color-sand);
+  .calendar-section .section-subtext {
+    color: #4d4d4d;
   }
 
-  .featured-container {
-    display: flex;
-    gap: 40px;
-    max-width: 1000px;
-    margin: 0 auto;
-    align-items: center;
-  }
-
-  .featured-main {
-    flex: 1;
-  }
-
-  .featured-button {
-    display: inline-block;
-    padding: 18px 40px;
-    background: var(--color-rust);
-    color: white;
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-  }
-
-  .featured-button:hover {
-    opacity: 0.9;
-  }
-
-  .featured-marketing {
-    flex: 1;
-  }
-
-  .marketing-placeholder {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    aspect-ratio: 3/2;
-  }
-
-  .placeholder-label {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--color-rust);
-    padding: 6px 14px;
-    border: 3px solid var(--color-graphite);
-    font-family: var(--font-body);
-    font-size: 11px;
-    color: white;
-    text-transform: uppercase;
-  }
-
-  /* Events Grid Section */
-  .events-grid-section {
-    padding: 60px 5%;
-    background: var(--color-sand);
-  }
-
-  .events-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
+  .next-event-grid {
     max-width: 1200px;
     margin: 0 auto;
-    justify-content: center;
-  }
-
-  .event-card {
-    flex: 0 0 calc(20% - 20px);
-    min-width: 200px;
-    max-width: 240px;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
-
-  .event-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  .event-image {
-    aspect-ratio: 7/5;
-    overflow: hidden;
-  }
-
-  .event-info {
-    padding: 16px;
-    text-align: center;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
   }
 
   .event-title {
+    margin: 0 0 8px;
+    color: #fff;
     font-family: var(--font-heading);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-graphite);
-    margin: 0 0 4px 0;
+    font-size: clamp(18px, 2.6vw, 32px);
     text-transform: uppercase;
   }
 
-  .event-date {
+  .event-meta,
+  .event-description {
+    margin: 0 0 12px;
+    color: #e8e8e8;
     font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--color-graphite);
-    margin: 0;
-    opacity: 0.7;
+    font-size: 15px;
+    line-height: 1.6;
   }
 
-  .grid-note {
-    font-family: var(--font-body);
-    font-size: 13px;
-    color: var(--color-graphite);
-    text-align: center;
-    margin: 24px 0 0 0;
-    opacity: 0.6;
+  .next-event-image {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 6px;
   }
 
-  /* Accordion Section */
-  .accordion-section {
-    padding: 40px 5%;
-    background: white;
+  .next-event-button {
+    margin-top: 16px;
+    width: min(100%, 320px);
   }
 
-  /* Request Buttons Section */
-  .request-section {
-    padding: 40px 5%;
-    background: white;
-  }
-
-  .request-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    max-width: 600px;
+  .calendar-grid {
+    max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
   }
 
-  .request-button {
-    display: inline-block;
-    padding: 16px 32px;
-    background: var(--color-rust);
-    color: white;
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
+  .calendar-card {
+    display: block;
     text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-    text-align: center;
-    min-width: 200px;
+    border: 1px solid #dadada;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .request-button:hover {
-    opacity: 0.9;
+  .calendar-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
   }
 
-  /* Up ENDing Parkinsons Section */
-  .upending-section {
-    padding: 60px 5%;
-    background: white;
+  .calendar-card-image {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+    display: block;
   }
 
-  .upending-container {
-    display: flex;
-    gap: 40px;
-    max-width: 1000px;
+  .calendar-card-body {
+    padding: 12px;
+  }
+
+  .calendar-card-title {
+    margin: 0 0 4px;
+    color: #000;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .calendar-card-date {
+    margin: 0;
+    color: #666;
+    font-family: var(--font-body);
+    font-size: 12px;
+  }
+
+  .calendar-empty {
+    margin: 0;
+    color: #4d4d4d;
+    font-family: var(--font-body);
+  }
+
+  .spotlight-card {
+    max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    border: 1px solid #dadada;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .spotlight-image {
+    width: 100%;
+    height: 100%;
+    min-height: 260px;
+    object-fit: cover;
+  }
+
+  .spotlight-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .spotlight-date,
+  .spotlight-description,
+  .spotlight-address {
+    margin: 0;
+    color: #333;
+    font-family: var(--font-body);
+    line-height: 1.6;
+  }
+
+  .group-subtitle {
+    margin: 0 0 14px;
+    color: #84babf;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .group-footnote {
+    margin: 18px 0 20px;
+    color: #cfcfcf;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .group-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .upending-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
   }
 
-  .upending-text {
-    flex: 1;
-  }
-
-  .upending-link {
-    font-family: var(--font-body);
-    font-size: 18px;
-    font-weight: 400;
-    color: var(--color-graphite);
-    text-decoration: underline;
-    display: block;
-    transition: opacity 0.2s ease;
-  }
-
-  .upending-link:hover {
-    opacity: 0.8;
-  }
-
   .upending-image {
-    flex: 1;
-    position: relative;
-    aspect-ratio: 16/10;
-    border-radius: 4px;
-    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 6px;
   }
 
-  .upending-label {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--color-rust);
-    padding: 6px 14px;
-    border: 3px solid var(--color-graphite);
-    font-family: var(--font-body);
-    font-size: 11px;
-    color: white;
-    text-transform: uppercase;
-  }
-
-  /* Register CTA Section */
-  .register-cta-section {
-    padding: 40px 5%;
-    background: white;
-    text-align: center;
-  }
-
-  .register-cta-button {
-    display: inline-block;
-    padding: 16px 60px;
-    background: var(--color-manatee);
-    color: var(--color-graphite);
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: none;
+  .past-events-summary {
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    list-style: none;
   }
 
-  .register-cta-button:hover {
-    opacity: 0.9;
+  .past-events-summary::-webkit-details-marker {
+    display: none;
   }
 
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .hero-section {
-      height: 50vh;
-      min-height: 350px;
-    }
+  .calendar-card--past {
+    opacity: 0.75;
+  }
 
-    .hero-headline {
-      font-size: 42px;
-    }
-
-    .hero-content {
-      bottom: 15%;
-      right: 5%;
-    }
-
-    .hero-video-placeholder {
-      top: 10%;
-      right: 5%;
-    }
-
-    .video-box {
-      padding: 16px 20px;
-    }
-
-    .featured-section {
-      padding: 40px 5%;
-    }
-
-    .featured-container {
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .featured-button {
-      width: 100%;
-      text-align: center;
-    }
-
-    .events-grid-section {
-      padding: 40px 5%;
-    }
-
-    .events-grid {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .event-card {
-      flex: 0 0 100%;
-      width: 100%;
-      max-width: 300px;
-    }
-
-    .grid-note {
-      display: none;
-    }
-
-    .accordion-section {
-      padding: 30px 5%;
-    }
-
-    .request-section {
-      padding: 30px 5%;
-    }
-
-    .request-buttons {
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .request-button {
-      width: 100%;
-      min-width: unset;
-    }
-
-    .upending-section {
-      padding: 40px 5%;
-    }
-
-    .upending-container {
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .upending-link {
-      font-size: 16px;
-      text-align: center;
-    }
-
-    .register-cta-section {
-      padding: 40px 5%;
-    }
-
-    .register-cta-button {
-      width: 100%;
-      padding: 18px 40px;
-      font-size: 16px;
+  @media (max-width: 900px) {
+    .next-event-grid,
+    .spotlight-card,
+    .upending-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

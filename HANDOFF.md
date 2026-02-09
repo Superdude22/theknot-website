@@ -1,134 +1,78 @@
-# The Knot - Astro + Keystatic Migration Handoff
+# The Knot — Astro + Keystatic (Cloudflare Pages) Handoff
 
-## Project Status: Phase 2 Complete (Pages Migrated)
+## Current Status
+- Astro site builds and deploys to Cloudflare Pages.
+- Keystatic admin UI is available at `/keystatic`.
+- Production Keystatic uses GitHub storage for `Superdude22/theknot-website`.
+- Staff access on dev is gated by Cloudflare Access + GitHub repo permissions.
 
-Core site pages have been migrated to Astro, Keystatic is wired up, and `npm run build` succeeds with the Cloudflare adapter.
+## Repo Layout (key files)
+- `astro.config.mjs` — Astro config (Cloudflare adapter + SSR route include for Keystatic)
+- `keystatic.config.ts` — Keystatic schemas + storage switch by `NODE_ENV`
+- `wrangler.toml` — Cloudflare Pages project + KV binding for sessions
+- `src/content/` — Keystatic content lives here (JSON, plus images in `public/`)
+- `src/layouts/BaseLayout.astro` — Brand CSS variables injection
+- `src/styles/global.css` — Fonts + Tailwind + CSS variables
 
----
-
-## What's Been Done
-
-### Project Structure Created
-```
-TheKnot/astro-site/
-├── astro.config.mjs          # Astro config (static output + Cloudflare adapter)
-├── keystatic.config.ts       # Full content schema definitions
-├── tailwind.config.mjs       # Brand colors as CSS variables
-├── package.json              # Dependencies installed
-│
-├── public/
-│   ├── fonts/                # Zing Rust, Uniform Pro, Rubik (copied from existing)
-│   └── images/               # All images (logos, canva-final, etc.)
-│
-└── src/
-    ├── content/
-    │   └── config.ts         # Astro content collection schemas
-    ├── layouts/
-    │   └── BaseLayout.astro  # Main layout with dynamic brand color injection
-    ├── components/
-    │   ├── Header.astro      # Static header
-    │   ├── HeaderMobile.tsx  # React island for mobile menu
-    │   ├── Footer.astro      # Static footer
-    │   ├── AnnouncementBanner.astro
-    │   ├── HeroSection.astro
-    │   ├── ThreeCardSection.astro
-    │   └── Accordion.tsx     # React island
-    ├── pages/
-    │   ├── index.astro       # Home page (working)
-    │   └── keystatic/
-    │       └── [...path].astro  # Admin UI (SSR enabled)
-    └── styles/
-        └── global.css        # Font faces, CSS variables, Tailwind
-```
-
-Note: Keystatic admin/API routes are now provided by the `@keystatic/astro` integration (the manual `src/pages/keystatic/*` and `src/pages/api/keystatic/*` route files were removed to avoid Astro 5 build issues).
-
-### Keystatic Schemas Defined
-
-**Singletons (one-off content):**
-- `brand` - Editable brand colors (rust, manatee, limestone, etc.)
-- `announcement` - Banner text, link, background color, enabled toggle
-- `homePage` - Hero section, membership section, code of conduct
-- `aboutPage` - Hero, mission, story, team headline
-- `membershipPage` - Hero, pricing, benefits
-- `newClimberPage` - Hero, getting started, day pass info
-- `amenitiesPage` - Hero, features list
-- `shopPage` - Hero, intro text
-
-**Collections (multiple items):**
-- `team` - Name, role, bio, photo, order, isLeadership
-- `events` - Title, date, time, description, image, registration link, featured/recurring flags
-- `policies` - Title, rich content, button text/link, order
-- `products` - Name, price, description, images, sizes, category, inStock
-- `notReadyCards` - Label, description, button text/link, image, order
-
-### Key Technical Details
-
-1. **Output Mode**: `output: 'static'` (Astro 5) with Cloudflare adapter
-2. **Brand Colors**: CSS variables in `:root`, Tailwind references them via `var(--color-*)`
-3. **React Islands**: HeaderMobile.tsx and Accordion.tsx use `client:load` / `client:visible`
-4. **Fonts**: Loaded via @font-face in global.css
-5. **Keystatic Routes**: Provided by `@keystatic/astro` integration (no manual routes in `src/pages/keystatic` or `src/pages/api/keystatic`)
-
----
-
-## How to Run
-
+## Run Locally
 ```bash
 cd TheKnot/astro-site
+npm ci
 npm run dev
 ```
+- Site: `http://127.0.0.1:4321/`
+- Keystatic: `http://127.0.0.1:4321/keystatic`
 
-- **Site**: http://127.0.0.1:4321/
-- **Admin**: http://127.0.0.1:4321/keystatic
+Local Keystatic uses `storage.kind: 'local'` unless `NODE_ENV=production`.
 
----
+## Build / Deploy
+- Build: `npm run build`
+- Output: `dist/`
+- Cloudflare Pages project: `theknot-website` (see `wrangler.toml`)
 
-## What's Next (Phase 3 - Production Deployment)
+## Keystatic Schemas
+Defined in `keystatic.config.ts`.
 
-1. Create a GitHub **App** for Keystatic and set Cloudflare env vars (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, `NODE_ENV=production`, `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`)
-2. Deploy repo to Cloudflare Pages (`npm run build`, output `dist`)
-3. Add custom domain (e.g. `dev.climbtheknot.com`) and verify `/keystatic` login + editing
+**Singletons**
+- `brand` — Brand colors (CSS variables)
+- `announcement` — Banner content
+- `homePage`, `aboutPage`, `membershipPage`, `newClimberPage`, `amenitiesPage`, `shopPage`
 
----
+**Collections**
+- `team`
+- `events`
+- `policies`
+- `products`
+- `notReadyCards`
 
-## Known Issues / Warnings
+## Production Requirements (Cloudflare)
+### KV binding
+Keystatic auth uses sessions, which require a KV binding named `SESSION` (declared in `wrangler.toml`).
 
-1. **Empty content directories** - Warnings about no files in `content/team`, `content/events`, etc. are expected until content is created via Keystatic
-2. **Cloudflare SESSION binding** - Can ignore for local dev; needed for production
-3. **Sharp warning** - Cloudflare doesn't support sharp at runtime; images work fine for static builds
+### Environment variables
+Set in Cloudflare Pages for **Production** and **Preview**:
+- `NODE_ENV=production`
+- `KEYSTATIC_SECRET`
+- `KEYSTATIC_GITHUB_CLIENT_ID`
+- `KEYSTATIC_GITHUB_CLIENT_SECRET`
+- `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`
 
----
+See `.env.example` for the list (do not commit real values).
 
-## Reference Files
+## GitHub App Requirements (Keystatic GitHub auth)
+GitHub App settings must match:
+- Callback URL: `https://dev.climbtheknot.com/api/keystatic/github/oauth/callback`
+- “Expire user authorization tokens” enabled (refresh tokens)
+- Repo permissions: Contents read/write
+- App installed on `Superdude22/theknot-website`
 
-- **Existing Next.js site**: `TheKnot/website/` (keep for content reference)
-- **Brand tokens**: `TheKnot/website/src/lib/brandTokens.ts`
-- **Design reference**: `TheKnot/website/design-reference/` (23 Canva slides)
-- **Plan file**: `C:\Users\Mike Palmer\.claude\plans\indexed-snacking-patterson.md`
+## Staff Onboarding (dev)
+For a staff member to successfully use `https://dev.climbtheknot.com/keystatic`:
+1) Cloudflare Access policy must allow them onto `dev.climbtheknot.com` (or at least `/keystatic` + `/api/keystatic/*`)
+2) They must have GitHub access to `Superdude22/theknot-website` (write or higher)
+3) They must authorize the correct GitHub App
 
----
+## Notes / Pitfalls
+- Do not add manual Keystatic routes under `src/pages/keystatic/*` or `src/pages/api/keystatic/*`. Routes are provided by `@keystatic/astro`.
+- Avoid `wrangler pages download config --force` unless you intend to review/merge overwrites to `wrangler.toml`.
 
-## GitHub Setup (Production Deployment)
-
-For production with Keystatic GitHub mode:
-
-1. Create new repo (e.g., `theknot-website`)
-2. Update `keystatic.config.ts`:
-   ```ts
-   storage: {
-     kind: 'github',
-     repo: 'OWNER/theknot-website',
-   }
-   ```
-3. Create GitHub App for Keystatic auth
-4. Deploy to Cloudflare Pages
-5. Configure `dev.climbtheknot.com` DNS
-
----
-
-## Session Context
-
-- **Branch**: mikes-ai-hub (or create new branch for this work)
-- **Approach**: Hybrid - Claude Code built foundation, Ralph PRD handles page migration
-- **User preference**: Brand colors editable via Keystatic admin

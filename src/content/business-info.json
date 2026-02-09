@@ -1,0 +1,30 @@
+{
+  "contact": {
+    "phone": "(352) 322-2402",
+    "phoneRaw": "3523222402",
+    "email": "info@climbtheknot.com",
+    "eventsEmail": "events@climbtheknot.com"
+  },
+  "address": {
+    "street": "704 S Main St",
+    "city": "Gainesville",
+    "state": "FL",
+    "zip": "32601"
+  },
+  "hours": [
+    { "days": "Sunday", "hours": "7AM - 10PM" },
+    { "days": "Monday - Thursday", "hours": "7AM - 11PM" },
+    { "days": "Friday - Saturday", "hours": "7AM - 10PM" }
+  ],
+  "social": {
+    "instagramUrl": "https://www.instagram.com/climbtheknot",
+    "facebookUrl": "https://www.facebook.com/climbtheknot"
+  },
+  "portal": {
+    "baseUrl": "https://portal.climbtheknot.com"
+  },
+  "gym": {
+    "capacityMax": 100,
+    "copyrightEntity": "The Knot - Climbing Gym"
+  }
+}

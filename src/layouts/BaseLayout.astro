@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AnnouncementBanner from '../components/AnnouncementBanner.astro';
+import CodeOfConduct from '../components/CodeOfConduct.astro';
 
 // Import brand settings from Keystatic (if exists)
 let brandColors = {
@@ -25,6 +26,14 @@ let announcement = {
   backgroundColor: 'rust',
 };
 
+type AnnouncementBannerColor = 'rust' | 'manatee' | 'limestone' | 'graphite';
+const validAnnouncementColors = new Set<AnnouncementBannerColor>([
+  'rust',
+  'manatee',
+  'limestone',
+  'graphite',
+]);
+
 // Try to load brand settings from content (graceful fallback)
 try {
   const brandFile = await import('../content/brand.json').catch(() => null);
@@ -45,6 +54,17 @@ try {
   // Use defaults
 }
 
+// Try to load business info for portal preconnect
+let portalBaseUrl = 'https://portal.climbtheknot.com';
+try {
+  const biFile = await import('../content/business-info.json').catch(() => null);
+  if (biFile?.default?.portal?.baseUrl) {
+    portalBaseUrl = biFile.default.portal.baseUrl;
+  }
+} catch (e) {
+  // Use default
+}
+
 interface Props {
   title: string;
   description?: string;
@@ -52,6 +72,9 @@ interface Props {
 }
 
 const { title, description = 'The Knot Climbing Gym - Gainesville\'s premier climbing facility', isHome = false } = Astro.props;
+const announcementBackgroundColor = validAnnouncementColors.has(announcement.backgroundColor as AnnouncementBannerColor)
+  ? (announcement.backgroundColor as AnnouncementBannerColor)
+  : 'rust';
 ---
 
 <!doctype html>
@@ -60,8 +83,15 @@ const { title, description = 'The Knot Climbing Gym - Gainesville\'s premier cli
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/png" href="/images/logos/Favicon 45.png" />
+    <link rel="icon" type="image/png" href="/images/logos/favicon-32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/images/logos/favicon-48.png" sizes="48x48" />
     <title>{title} | The Knot Climbing Gym</title>
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href={portalBaseUrl} crossorigin />
+
+    <!-- Preload only the most critical heading font file -->
+    <link rel="preload" href="/fonts/Uniform-Black.otf" as="font" type="font/otf" crossorigin />
 
     <!-- Inject brand colors as CSS variables -->
     <style define:vars={{
@@ -89,20 +119,24 @@ const { title, description = 'The Knot Climbing Gym - Gainesville\'s premier cli
     </style>
   </head>
   <body>
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+
     {announcement.enabled && (
       <AnnouncementBanner
         text={announcement.text}
         linkText={announcement.linkText}
         linkUrl={announcement.linkUrl}
-        backgroundColor={announcement.backgroundColor}
+        backgroundColor={announcementBackgroundColor}
       />
     )}
 
     <Header isHome={isHome} showAnnouncement={announcement.enabled} />
 
-    <main>
+    <main id="main-content">
       <slot />
     </main>
+
+    <CodeOfConduct />
 
     <Footer />
   </body>

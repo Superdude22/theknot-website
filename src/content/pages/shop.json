@@ -1,0 +1,11 @@
+{
+  "hero": {
+    "headline": "SHOP",
+    "backgroundImage": "/images/canva-final/canva-hills-background.jpg",
+    "backgroundImageLibraryPath": "public/images/canva-final/canva-hills-background.jpg"
+  },
+  "gearStoreButton": {
+    "text": "Gear store",
+    "url": "https://portal.climbtheknot.com/gnv/shop"
+  }
+}

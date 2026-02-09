@@ -1,24 +1,28 @@
 ---
 interface Props {
   headline: string;
-  subtext: string[];
-  buttonText: string;
-  buttonLink: string;
+  subtext?: string[];
+  buttonText?: string;
+  buttonLink?: string;
   backgroundVideo?: string;
   backgroundImage?: string;
+  variant?: 'home' | 'page-cover';
 }
 
 const {
   headline,
-  subtext,
+  subtext = [],
   buttonText,
   buttonLink,
   backgroundVideo,
   backgroundImage = '/images/canva-final/home-hero-bg.jpg',
+  variant = 'home',
 } = Astro.props;
+
+const isPageCover = variant === 'page-cover';
 ---
 
-<section class="hero">
+<section class={`hero ${isPageCover ? 'hero--page-cover' : 'hero--home'}`}>
   <!-- Background -->
   <div class="hero__background">
     {backgroundVideo ? (
@@ -37,6 +41,8 @@ const {
         alt=""
         class="hero__image"
         loading="eager"
+        fetchpriority="high"
+        decoding="async"
       />
     )}
     <div class="hero__overlay"></div>
@@ -44,26 +50,39 @@ const {
 
   <!-- Content -->
   <div class="hero__content">
-    <h1 class="hero__headline">{headline}</h1>
-    <div class="hero__subtext">
-      {subtext.map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
-    </div>
-    <a href={buttonLink} class="btn-primary hero__button">
-      {buttonText}
-    </a>
+    <h1 class="heading-xl hero__headline">{headline}</h1>
+    {subtext.length > 0 && (
+      <div class="hero__subtext">
+        {subtext.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+    )}
+    {buttonText && buttonLink && (
+      <a href={buttonLink} class="btn-primary hero__button">
+        {buttonText}
+      </a>
+    )}
   </div>
 </section>
 
 <style>
   .hero {
     position: relative;
-    min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
+  }
+
+  .hero--home {
+    min-height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .hero--page-cover {
+    height: 50vh;
+    align-items: flex-end;
+    justify-content: flex-end;
   }
 
   .hero__background {
@@ -98,32 +117,50 @@ const {
   .hero__content {
     position: relative;
     z-index: 1;
-    text-align: center;
-    padding: 120px 24px 80px;
-    max-width: 900px;
+    text-align: left;
+    padding: 120px 48px 80px;
+    max-width: 800px;
+  }
+
+  .hero--home .hero__content {
+    margin-left: 48px;
+  }
+
+  .hero--page-cover .hero__content {
+    text-align: right;
+    margin-left: auto;
+    margin-right: 48px;
+    padding: 48px;
   }
 
   .hero__headline {
-    font-family: var(--font-display);
-    font-size: 72px;
-    font-weight: 400;
     color: white;
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    margin: 0 0 32px 0;
-    line-height: 1;
+    margin: 0 0 24px 0;
+  }
+
+  .hero--page-cover .hero__headline {
+    margin: 0;
   }
 
   .hero__subtext {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
+    max-width: 600px;
   }
 
   .hero__subtext p {
     font-family: var(--font-body);
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
     line-height: 1.6;
     margin: 0 0 16px;
+  }
+
+  .hero__subtext p:first-child {
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 12px;
   }
 
   .hero__subtext p:last-child {
@@ -137,27 +174,57 @@ const {
 
   /* Tablet */
   @media (max-width: 1024px) {
-    .hero__headline {
-      font-size: 56px;
+    .hero--home .hero__content {
+      margin-left: 32px;
+      padding: 100px 32px 60px;
+    }
+
+    .hero--page-cover .hero__content {
+      margin-right: 32px;
+      padding: 32px;
     }
 
     .hero__subtext p {
-      font-size: 16px;
+      font-size: 14px;
+    }
+
+    .hero__subtext p:first-child {
+      font-size: 15px;
     }
   }
 
   /* Mobile */
   @media (max-width: 768px) {
-    .hero__content {
-      padding: 100px 20px 60px;
+    .hero--home {
+      justify-content: center;
     }
 
-    .hero__headline {
-      font-size: 40px;
-      letter-spacing: 2px;
+    .hero--page-cover {
+      height: 40vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero__content {
+      padding: 100px 20px 60px;
+      margin-left: 0;
+      margin-right: 0;
+      text-align: center;
+    }
+
+    .hero--page-cover .hero__content {
+      padding: 32px 20px;
+    }
+
+    .hero__subtext {
+      max-width: 100%;
     }
 
     .hero__subtext p {
+      font-size: 14px;
+    }
+
+    .hero__subtext p:first-child {
       font-size: 14px;
     }
 

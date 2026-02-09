@@ -2,7 +2,9 @@
   "name": "ASHLEY MARCONE",
   "role": "Head Setter",
   "bio": "",
-  "photo": "/images/canva-final/team-ashley-marcone.jpg",
+  "photo": "/images/canva-final/ashley-marcone/team-ashley-marcone.jpg",
   "order": 4,
-  "isLeadership": true
+  "isLeadership": true,
+  "teamGroup": "leadership",
+  "photoLibraryPath": "public/images/canva-final/ashley-marcone/team-ashley-marcone.jpg"
 }

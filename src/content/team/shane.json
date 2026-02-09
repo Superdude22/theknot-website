@@ -2,7 +2,9 @@
   "name": "SHANE",
   "role": "Staff",
   "bio": "",
-  "photo": "/images/canva-final/staff-shane.jpg",
+  "photo": "/images/canva-final/shane/staff-shane.jpg",
   "order": 27,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "staff",
+  "photoLibraryPath": "public/images/canva-final/shane/staff-shane.jpg"
 }

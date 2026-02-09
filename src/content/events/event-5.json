@@ -4,5 +4,7 @@
   "time": "7:00 PM - 10:00 PM",
   "description": "Evening social climb with live music and refreshments. A great way to end your week!",
   "isFeatured": false,
-  "isRecurring": false
+  "isRecurring": false,
+  "image": "/images/canva-final/event-5/canva-hills-background.jpg",
+  "imageLibraryPath": "public/images/canva-final/event-5/canva-hills-background.jpg"
 }

@@ -2,7 +2,9 @@
   "name": "CLAUDIA",
   "role": "Coordinator",
   "bio": "",
-  "photo": "/images/canva-final/staff-claudia.jpg",
+  "photo": "/images/canva-final/claudia/staff-claudia.jpg",
   "order": 11,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "coordinator",
+  "photoLibraryPath": "public/images/canva-final/claudia/staff-claudia.jpg"
 }

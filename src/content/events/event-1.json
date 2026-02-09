@@ -5,5 +5,7 @@
   "description": "Join us for an exciting evening event at The Knot. Perfect for climbers of all skill levels looking to connect with the community.",
   "registrationLink": "https://portal.climbtheknot.com/gnv/events/event-1",
   "isFeatured": false,
-  "isRecurring": false
+  "isRecurring": false,
+  "image": "/images/canva-final/event-1/canva-hills-background.jpg",
+  "imageLibraryPath": "public/images/canva-final/event-1/canva-hills-background.jpg"
 }

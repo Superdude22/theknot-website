@@ -28,3 +28,10 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local artifacts
+dev-server.log
+logs/
+tmp/
+nul
+reports/

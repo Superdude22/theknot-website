@@ -1,104 +1,238 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HeroSection from '../components/HeroSection.astro';
-import ThreeCardSection from '../components/ThreeCardSection.astro';
 import Accordion from '../components/Accordion.tsx';
+import { getCollection } from 'astro:content';
+import fs from 'node:fs';
+import path from 'node:path';
 
-// Default home page content (will be replaced by Keystatic content)
-const heroContent = {
-  headline: 'CLIMB. TRAIN. LEARN.',
-  subtext: [
-    "Built by climbers, The Knot is Gainesville's hub for the climbing community.",
-    "Want to pick up a new exciting hobby that can take you on adventures around the world? Want to stay in shape through a fun, community-focused sport? Whatever your climbing goals, we've got you covered with a variety of climbing surfaces, training equipment, classes, on-site gear store, and yoga."
-  ],
-  buttonText: 'START CLIMBING',
-  buttonLink: '/new-climber',
+// Load home page content from Keystatic
+let homeContent;
+try {
+  const homePathCandidates = [
+    path.join(process.cwd(), 'src/content/pages/home.json'),
+    path.join(process.cwd(), 'src/content/pages/home/index.json'),
+  ];
+  const homePagePath =
+    homePathCandidates.find((candidatePath) => fs.existsSync(candidatePath)) ||
+    homePathCandidates[0];
+  const raw = fs.readFileSync(homePagePath, 'utf-8');
+  homeContent = JSON.parse(raw);
+} catch (e) {
+  // Fallback content if file doesn't exist
+  homeContent = {
+    hero: {
+      headline: 'CLIMB. TRAIN. LEARN.',
+      subtext: [
+        "Built by climbers, The Knot is Gainesville's hub for the climbing community.",
+        "Want to pick up a new exciting hobby that can take you on adventures around the world? Want to stay in shape through a fun, community-focused sport? Whatever your climbing goals, we've got you covered with a variety of climbing surfaces, training equipment, classes, on-site gear store, and yoga."
+      ],
+      buttonText: 'START CLIMBING',
+      buttonLink: '/new-climbers',
+    },
+    membership: {
+      headline: 'START YOUR MEMBERSHIP TODAY FOR',
+      promoPrice: '$XX',
+      monthlyRate: 'Then $80/month, billed on the first of every month.',
+      description: 'Only pay for the remaining days of this month, then cancel anytime with no contract or additional fees.',
+      buttonText: 'JOIN NOW',
+      buttonLink: 'https://portal.climbtheknot.com/gnv/memberships/join',
+    },
+    notReadySection: {
+      headline: 'NOT READY TO COMMIT? NO PROBLEM!',
+    },
+    ratesPoliciesHeadline: 'RATES & POLICIES',
+    codeOfConduct: {
+      headline: 'CODE OF CONDUCT',
+      paragraphs: [
+        'At The Knot Climbing Gym, we are committed to providing a welcoming, inclusive, and safe environment for all of our climbers and staff. We believe that everyone deserves to feel respected and valued while enjoying their time in our facility.',
+        "As such, we have a zero-tolerance policy for any form of harassment, discrimination, violence, suggestion of violence, hate speech, or any other unwanted behavior that makes others feel uncomfortable. This policy may (at management's sole discretion) be applied to behavior both inside and outside The Knot Climbing Gym.",
+      ],
+    },
+  };
+}
+
+// Extract content from Keystatic data
+const heroContent = homeContent.hero;
+const membershipContent = homeContent.membership;
+const notReadySectionContent = homeContent.notReadySection;
+const ratesPoliciesHeadline = homeContent.ratesPoliciesHeadline;
+const toPublicUrl = (libraryPath?: string) =>
+  libraryPath && libraryPath.startsWith('public/')
+    ? `/${libraryPath.slice('public/'.length)}`
+    : undefined;
+
+const heroImageFromCms = toPublicUrl(heroContent?.backgroundImageLibraryPath) || heroContent?.backgroundImage;
+const homeHeroImage =
+  heroImageFromCms === '/images/canva-final/home-hero-bg.jpg'
+    ? '/images/canva-final/home-hero-bg-1366.jpg'
+    : (heroImageFromCms || '/images/canva-final/home-hero-bg-1366.jpg');
+const membershipImageFromCms =
+  toPublicUrl(membershipContent?.imageLibraryPath) || membershipContent?.image;
+const membershipPromoImage =
+  membershipImageFromCms === '/images/canva-final/home-hero-bg.jpg'
+    ? '/images/canva-final/home-hero-bg-1366.jpg'
+    : (membershipImageFromCms || '/images/canva-final/home-hero-bg-1366.jpg');
+const heroVideoPath = toPublicUrl(heroContent?.backgroundVideoLibraryPath) || heroContent?.backgroundVideo;
+
+const richTextToPlainText = (value: unknown): string => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+
+  const blocks = Array.isArray(value)
+    ? value
+    : Array.isArray((value as { document?: unknown[] }).document)
+      ? (value as { document?: unknown[] }).document || []
+      : [];
+
+  return blocks
+    .map((block) => {
+      const children = Array.isArray((block as { children?: unknown[] }).children)
+        ? (block as { children?: unknown[] }).children || []
+        : [];
+      return children
+        .map((child) =>
+          typeof (child as { text?: unknown }).text === 'string'
+            ? ((child as { text?: string }).text || '')
+            : ''
+        )
+        .join('');
+    })
+    .filter(Boolean)
+    .join('\n\n');
 };
 
-const membershipContent = {
-  headline: 'START YOUR MEMBERSHIP TODAY FOR',
-  promoPrice: '$XX',
-  monthlyRate: 'Then $80/month, billed on the first of every month.',
-  description: 'Only pay for the remaining days of this month, then cancel anytime with no contract or additional fees.',
-  buttonText: 'JOIN NOW',
-  buttonLink: 'https://portal.climbtheknot.com/gnv/memberships/join',
-};
+// Load policies for home accordion.
+// Priority: Home singleton policy list -> policies collection -> hardcoded fallback.
+let policies = [];
 
-const notReadyCards = [
+const singletonPolicies = Array.isArray(homeContent?.ratesPoliciesItems)
+  ? homeContent.ratesPoliciesItems
+      .map((item: any) => ({
+        title: item?.title || '',
+        content: item?.content || '',
+        buttonText: item?.buttonText || '',
+        buttonLink: item?.buttonLink || '',
+        order: item?.order,
+      }))
+      .filter((item: any) => item.title && item.content)
+      .sort((a: any, b: any) => (a.order || 99) - (b.order || 99))
+  : [];
+
+if (singletonPolicies.length > 0) {
+  policies = singletonPolicies;
+} else {
+  try {
+    const policiesCollection = await getCollection('policies');
+    policies = policiesCollection
+      .map((p) => ({
+        title: p.data.title,
+        content: richTextToPlainText(p.data.content),
+        buttonText: p.data.buttonText,
+        buttonLink: p.data.buttonLink,
+        order: p.data.order,
+      }))
+      .filter((item) => item.title && item.content)
+      .sort((a, b) => (a.order || 99) - (b.order || 99));
+
+    if (policies.length === 0) {
+      throw new Error('No usable policy entries found in collection');
+    }
+  } catch {
+    policies = [
+      {
+        title: 'BILLING & PAYMENTS',
+        content: `Payments & billing changes processed on the 1st of each month.\n\nSubmit all change requests by the 25th to ensure they'll be processed before billing.`,
+        buttonText: 'UPDATE BILLING',
+        buttonLink: 'https://portal.climbtheknot.com/gnv/account/billing',
+      },
+      {
+        title: 'MEMBERSHIP FREEZE',
+        content: `Freeze for $8/month (Minimum 1 month).\n\nLocks in your rate - even if we change pricing!\n\nEasy restart - just pay the prorated amount & resume billing.`,
+        buttonText: 'FREEZE YOUR MEMBERSHIP',
+        buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
+      },
+      {
+        title: 'CANCELLATIONS',
+        content: `Cancel anytime - Cancellations go into effect prior to billing on the first of the following month.\n\nPlanning on returning? Check out our Freeze option instead to come back on the Prorated amount.`,
+        buttonText: 'TERMINATE YOUR MEMBERSHIP',
+        buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
+      },
+      {
+        title: 'KIDS POLICIES',
+        content: `We're excited to welcome kids and youth climbers into our space. To keep the gym safe and fun for everyone, we have a few important policies in place:\n\n- Children under 5 are not permitted to climb in our facility.\n- Children 12 and under must be actively supervised by an adult at all times. We follow a 1:1 adult-to-child ratio.\n- For youth ages 13-15, we require at least one adult for every four climbers (4:1 ratio).\n\nIMPORTANT NOTE: The gym can get crowded during peak hours. We recommend that climbers 12 and under plan to finish their sessions before 6 PM on busy evenings.`,
+        buttonText: 'KIDS POLICIES',
+        buttonLink: 'https://portal.climbtheknot.com/gnv/policies/kids',
+      },
+      {
+        title: 'YOUTH MEMBERSHIPS',
+        content: `Kids & Youth memberships must be attached to a full-price adult membership ($80/month) and do not receive full member benefits.\n\n- Kids Membership (Ages 5 - 12): $25/month\n- Youth Membership (Ages 13 - 17): $45/month`,
+        buttonText: 'MEMBERSHIP PAGE',
+        buttonLink: '/membership#benefits',
+      },
+    ];
+  }
+}
+
+const fallbackNotReadyCards = [
   {
     label: 'Day Passes',
     description: 'Try it out just for the day! Available Mon - Fri from 10am - 3pm',
     buttonText: 'MORE INFO',
-    buttonLink: '/new-climber#day-passes',
+    buttonLink: '/new-climbers#day-passes',
+    image: '/images/canva-final/home-card-day-passes.jpg',
   },
   {
     label: 'Private Belayer',
     description: 'Hire a staff member to hold the ropes for you! Available by appointment only.',
     buttonText: 'SCHEDULE',
     buttonLink: 'https://portal.climbtheknot.com/gnv/services/private-belayer',
+    image: '/images/canva-final/home-card-private-belayer.jpg',
   },
   {
     label: 'Intro to Climbing',
     description: 'Learn the basics to get started with bouldering. Sign up for our next class!',
     buttonText: 'REGISTRATION',
     buttonLink: 'https://portal.climbtheknot.com/gnv/services/intro-class',
+    image: '/images/canva-final/home-card-intro-climbing.jpg',
   },
 ];
 
-const policies = [
-  {
-    title: 'BILLING & PAYMENTS',
-    content: `Payments & billing changes processed on the 1st of each month.\n\nSubmit all change requests by the 25th to ensure they'll be processed before billing.`,
-    buttonText: 'UPDATE BILLING',
-    buttonLink: 'https://portal.climbtheknot.com/gnv/account/billing',
-  },
-  {
-    title: 'MEMBERSHIP FREEZE',
-    content: `Freeze for $8/month (Minimum 1 month).\n\nLocks in your rate - even if we change pricing!\n\nEasy restart - just pay the prorated amount & resume billing.`,
-    buttonText: 'FREEZE YOUR MEMBERSHIP',
-    buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
-  },
-  {
-    title: 'CANCELLATIONS',
-    content: `Cancel anytime - Cancellations go into effect prior to billing on the first of the following month.\n\nPlanning on returning? Check out our Freeze option instead to come back on the Prorated amount.`,
-    buttonText: 'TERMINATE YOUR MEMBERSHIP',
-    buttonLink: 'https://portal.climbtheknot.com/gnv/account/change-request',
-  },
-  {
-    title: 'KIDS POLICIES',
-    content: `We're excited to welcome kids and youth climbers into our space. To keep the gym safe and fun for everyone, we have a few important policies in place:\n\n• Children under 5 are not permitted to climb in our facility.\n• Children 12 and under must be actively supervised by an adult at all times. We follow a 1:1 adult-to-child ratio.\n• For youth ages 13–15, we require at least one adult for every four climbers (4:1 ratio).\n\nIMPORTANT: The gym can get crowded during peak hours. We recommend that climbers 12 and under plan to finish their sessions before 6 PM on busy evenings.`,
-    buttonText: 'KIDS POLICIES',
-    buttonLink: 'https://portal.climbtheknot.com/gnv/policies/kids',
-  },
-  {
-    title: 'YOUTH MEMBERSHIPS',
-    content: `Kids & Youth memberships must be attached to a full-price adult membership ($80/month) and do not receive full member benefits.\n\n• Kids Membership (Ages 5 - 12): $25/month\n• Youth Membership (Ages 13 - 17): $45/month`,
-    buttonText: 'MEMBERSHIP PAGE',
-    buttonLink: '/membership#benefits',
-  },
-];
-
-const codeOfConduct = {
-  headline: 'CODE OF CONDUCT',
-  paragraphs: [
-    'At The Knot Climbing Gym, we are committed to providing a welcoming, inclusive, and safe environment for all of our climbers and staff. We believe that everyone deserves to feel respected and valued while enjoying their time in our facility.',
-    "As such, we have a zero-tolerance policy for any form of harassment, discrimination, violence, suggestion of violence, hate speech, or any other unwanted behavior that makes others feel uncomfortable. This policy may (at management's sole discretion) be applied to behavior both inside and outside The Knot Climbing Gym.",
-  ],
-};
+let notReadyCards = [...fallbackNotReadyCards];
+try {
+  const cardsCollection = await getCollection('not-ready-cards');
+  if (cardsCollection.length > 0) {
+    notReadyCards = cardsCollection
+      .map((card) => ({
+        label: card.data.label,
+        description: card.data.description,
+        buttonText: card.data.buttonText,
+        buttonLink: card.data.buttonLink,
+        image:
+          toPublicUrl(card.data.imageLibraryPath) ||
+          card.data.image ||
+          '/images/canva-final/canva-hills-background.jpg',
+        order: card.data.order,
+      }))
+      .sort((a, b) => (a.order || 99) - (b.order || 99));
+  }
+} catch {
+  // Keep fallback card content if collection is missing.
+}
 ---
 
 <BaseLayout title="Home" isHome={true}>
-  <!-- Hero Section -->
+  <!-- Full-screen Hero Section (100vh) -->
   <HeroSection
     headline={heroContent.headline}
     subtext={heroContent.subtext}
     buttonText={heroContent.buttonText}
     buttonLink={heroContent.buttonLink}
+    backgroundVideo={heroVideoPath}
+    backgroundImage={homeHeroImage}
   />
 
-  <!-- Secondary Navigation would go here -->
-
-  <!-- Membership Pricing Section -->
+  <!-- Membership Pricing CTA Section -->
   <section class="membership-section">
     <h2 class="membership-headline">
       {membershipContent.headline}<br />
@@ -108,9 +242,12 @@ const codeOfConduct = {
     <div class="pricing-container">
       <div class="pricing-image">
         <img
-          src="/images/canva-final/home-hero-bg.jpg"
+          src={membershipPromoImage}
           alt="Climber reaching for hold at The Knot"
           loading="lazy"
+          width="500"
+          height="281"
+          decoding="async"
         />
       </div>
 
@@ -121,7 +258,7 @@ const codeOfConduct = {
           href={membershipContent.buttonLink}
           target="_blank"
           rel="noopener noreferrer"
-          class="btn-secondary join-button"
+          class="btn-blue join-button"
         >
           {membershipContent.buttonText}
         </a>
@@ -131,168 +268,326 @@ const codeOfConduct = {
 
   <!-- Rates & Policies Accordion -->
   <section class="policies-section">
-    <h2 class="policies-heading">RATES & POLICIES</h2>
+    <h2 class="policies-heading">{ratesPoliciesHeadline}</h2>
     <Accordion client:visible items={policies} />
   </section>
 
-  <!-- Not Ready to Commit Section -->
+  <!-- Not Ready to Commit - Three Card Section -->
   <section class="not-ready-section">
-    <ThreeCardSection
-      title="NOT READY TO COMMIT? NO PROBLEM!"
-      cards={notReadyCards}
-    />
+    <div class="not-ready-container">
+      <h2 class="not-ready-heading">{notReadySectionContent?.headline || 'NOT READY TO COMMIT? NO PROBLEM!'}</h2>
+      <div class="not-ready-grid">
+        {notReadyCards.map((card) => (
+          <article class="not-ready-card">
+            <img
+              src={card.image || '/images/canva-final/canva-hills-background.jpg'}
+              alt={card.label}
+              class="not-ready-image"
+              loading="lazy"
+              decoding="async"
+              width="565"
+              height="260"
+            />
+            <h3 class="not-ready-title">{card.label}</h3>
+            <p class="not-ready-copy">{card.description}</p>
+            <a
+              href={card.buttonLink}
+              class="btn-red not-ready-button"
+              target={card.buttonLink.startsWith('http') ? '_blank' : undefined}
+              rel={card.buttonLink.startsWith('http') ? 'noopener noreferrer' : undefined}
+            >
+              {card.buttonText}
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
   </section>
 
-  <!-- Code of Conduct Section -->
-  <section class="coc-section">
-    <h2 class="coc-heading">{codeOfConduct.headline}</h2>
-    {codeOfConduct.paragraphs.map((paragraph) => (
-      <p class="coc-text">{paragraph}</p>
-    ))}
-  </section>
+  <!-- CTA Section with both button types -->
+  {(homeContent.ctaSection?.enabled !== false) && (
+    <section class="cta-section">
+      <h2 class="cta-headline">{homeContent.ctaSection?.headline || 'READY TO GET STARTED?'}</h2>
+      <p class="cta-subtext">{homeContent.ctaSection?.subtext || 'Join the climbing community today and start your journey.'}</p>
+      <div class="cta-buttons">
+        {(homeContent.ctaSection?.buttons && homeContent.ctaSection.buttons.length > 0) ? (
+          homeContent.ctaSection.buttons.map((btn: any) => (
+            <a
+              href={btn.url}
+              target={btn.url.startsWith('http') ? '_blank' : undefined}
+              rel={btn.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+              class={btn.style === 'red' ? 'btn-red' : 'btn-blue'}
+            >
+              {btn.text}
+            </a>
+          ))
+        ) : (
+          <>
+            <a href="https://portal.climbtheknot.com/gnv/memberships/join" target="_blank" rel="noopener noreferrer" class="btn-blue">BECOME A MEMBER</a>
+            <a href="/new-climbers" class="btn-red">LEARN MORE</a>
+          </>
+        )}
+      </div>
+    </section>
+  )}
+
 </BaseLayout>
 
 <style>
-  /* Membership Section */
   .membership-section {
-    padding: 48px;
-    background-color: black;
+    padding: 64px 48px 40px;
+    background: #000;
   }
 
   .membership-headline {
-    font-family: var(--font-heading);
-    font-size: 42px;
-    font-weight: 700;
-    color: white;
+    margin: 0 0 36px;
+    color: #fff;
     text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(42px, 5.4vw, 76px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
-    margin: 0 0 48px 0;
-    line-height: 1.2;
   }
 
   .price-highlight {
-    color: var(--color-manatee);
+    color: #84BABF;
   }
 
   .pricing-container {
-    display: flex;
-    gap: 48px;
     max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
     align-items: center;
   }
 
-  .pricing-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-  }
-
   .pricing-image img {
+    display: block;
     width: 100%;
-    max-width: 500px;
-    aspect-ratio: 16/9;
+    max-width: 565px;
+    aspect-ratio: 565 / 260;
     object-fit: cover;
-    border-radius: 8px;
   }
 
   .pricing-info {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 16px;
+    gap: 18px;
     text-align: right;
   }
 
   .pricing-note {
-    font-family: var(--font-body);
-    font-size: 18px;
-    color: white;
     margin: 0;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   .pricing-subtext {
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--color-sand);
     margin: 0;
-    max-width: 400px;
+    max-width: 520px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.45;
   }
 
   .join-button {
-    width: 100%;
-    max-width: 400px;
-    min-height: 55px;
-    margin-top: 16px;
+    width: min(100%, 500px);
+    margin-top: 14px;
+    text-decoration: none;
   }
 
-  /* Policies Section */
   .policies-section {
-    padding: 24px 48px 64px;
-    background-color: black;
+    padding: 0 48px 56px;
+    background: #000;
   }
 
   .policies-heading {
+    margin: 0 0 24px;
+    color: #fff;
     font-family: var(--font-heading);
-    font-size: 32px;
-    font-weight: 700;
-    color: white;
+    font-size: clamp(42px, 5vw, 68px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
-    margin: 0 0 24px 0;
-    letter-spacing: 1px;
   }
 
-  /* Not Ready Section */
   .not-ready-section {
-    padding: 80px 0;
-    background-color: black;
+    padding: 48px 0 80px;
+    background: #000;
   }
 
-  /* Code of Conduct Section */
-  .coc-section {
-    padding: 48px;
-    background-color: black;
-    text-align: center;
-    max-width: 900px;
+  .not-ready-container {
+    max-width: 1320px;
     margin: 0 auto;
+    padding: 0 48px;
   }
 
-  .coc-heading {
+  .not-ready-heading {
+    margin: 0 0 40px;
+    color: #fff;
+    text-align: center;
     font-family: var(--font-heading);
-    font-size: 16px;
-    font-weight: 700;
-    color: white;
+    font-size: clamp(42px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
-    margin: 0 0 24px 0;
-    letter-spacing: 1px;
   }
 
-  .coc-text {
+  .not-ready-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 345px));
+    justify-content: center;
+    gap: 88px;
+  }
+
+  .not-ready-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+  }
+
+  .not-ready-image {
+    display: block;
+    width: 100%;
+    max-width: 345px;
+    aspect-ratio: 345 / 221;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .not-ready-title {
+    margin: 16px 0 10px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(26px, 2vw, 34px);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  .not-ready-copy {
+    margin: 0;
+    color: #fff;
     font-family: var(--font-body);
-    font-size: 14px;
-    color: white;
-    line-height: 1.6;
-    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 345px;
   }
 
-  .coc-text:last-child {
-    margin-bottom: 0;
-  }
-
-  /* Mobile */
-  @media (max-width: 768px) {
-    .membership-section {
-      padding: 48px 24px;
+  @media (max-width: 1280px) {
+    .not-ready-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
     }
 
-    .membership-headline {
-      font-size: 28px;
+    .not-ready-image {
+      max-width: none;
+      aspect-ratio: 3 / 2;
+    }
+
+    .not-ready-copy {
+      max-width: 360px;
+    }
+  }
+
+  .not-ready-button {
+    text-decoration: none;
+    margin-top: auto;
+    align-self: center;
+  }
+
+  .cta-section {
+    padding: 80px 48px;
+    background-color: #111;
+    text-align: center;
+  }
+
+  .cta-headline {
+    margin: 0 0 16px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: clamp(30px, 4.2vw, 48px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  .cta-subtext {
+    margin: 0 0 32px;
+    color: #f0f0f0;
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .cta-buttons .btn-blue,
+  .cta-buttons .btn-red {
+    text-decoration: none;
+  }
+
+
+  @media (max-width: 1024px) {
+    .membership-section {
+      padding: 52px 32px 32px;
     }
 
     .pricing-container {
-      flex-direction: column;
-      gap: 32px;
+      gap: 36px;
+    }
+
+    .pricing-note {
+      font-size: 32px;
+    }
+
+    .pricing-subtext,
+    .not-ready-copy,
+    .cta-subtext {
+      font-size: 16px;
+    }
+
+    .not-ready-container {
+      padding: 0 32px;
+    }
+
+    .not-ready-title {
+      font-size: 26px;
+    }
+
+    .cta-section {
+      padding: 64px 32px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .membership-section {
+      padding: 48px 24px 28px;
+    }
+
+    .pricing-container {
+      grid-template-columns: 1fr;
+      gap: 28px;
     }
 
     .pricing-info {
@@ -300,8 +595,8 @@ const codeOfConduct = {
       text-align: center;
     }
 
-    .pricing-subtext {
-      max-width: 100%;
+    .pricing-note {
+      font-size: 26px;
     }
 
     .join-button {
@@ -309,19 +604,57 @@ const codeOfConduct = {
     }
 
     .policies-section {
-      padding: 24px 16px 48px;
-    }
-
-    .policies-heading {
-      font-size: 24px;
+      padding: 0 16px 44px;
     }
 
     .not-ready-section {
-      padding: 48px 0;
+      padding: 38px 0 52px;
     }
 
-    .coc-section {
-      padding: 32px 24px;
+    .not-ready-container {
+      padding: 0 24px;
+    }
+
+    .not-ready-grid {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .not-ready-title {
+      font-size: 26px;
+    }
+
+    .cta-section {
+      padding: 48px 24px;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .cta-buttons .btn-blue,
+    .cta-buttons .btn-red {
+      width: 100%;
+      max-width: 320px;
+    }
+
+  }
+
+  @media (max-width: 375px) {
+    .membership-section,
+    .cta-section {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .not-ready-container {
+      padding: 0 16px;
+    }
+
+    .not-ready-title {
+      font-size: 24px;
     }
   }
 </style>

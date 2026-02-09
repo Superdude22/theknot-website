@@ -2,7 +2,9 @@
   "name": "TALIA",
   "role": "Staff",
   "bio": "",
-  "photo": "/images/canva-final/staff-talia.jpg",
+  "photo": "/images/canva-final/talia/staff-talia.jpg",
   "order": 25,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "staff",
+  "photoLibraryPath": "public/images/canva-final/talia/staff-talia.jpg"
 }

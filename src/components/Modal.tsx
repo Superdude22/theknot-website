@@ -9,15 +9,17 @@ interface ModalProps {
   twoColumn?: boolean;
   imageContent?: ReactNode;
   lightTheme?: boolean;
+  ariaLabel?: string;
 }
 
-export function Modal({ 
-  isOpen, 
-  onClose, 
-  children, 
-  twoColumn = false, 
-  imageContent, 
-  lightTheme = false 
+export function Modal({
+  isOpen,
+  onClose,
+  children,
+  twoColumn = false,
+  imageContent,
+  lightTheme = false,
+  ariaLabel = 'Dialog'
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -94,6 +96,7 @@ export function Modal({
         onClick={handleOverlayClick}
         role="dialog"
         aria-modal="true"
+        aria-label={ariaLabel}
       >
         <div
           ref={modalRef}

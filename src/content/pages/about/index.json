@@ -1,0 +1,70 @@
+{
+  "hero": {
+    "headline": "ABOUT & FAQ",
+    "backgroundImage": "/images/canva-final/about-building-facade.jpg",
+    "backgroundImageLibraryPath": "public/images/canva-final/about-building-facade.jpg"
+  },
+  "aboutIntro": "Opened in 2021, The Knot Climbing Gym is a full-service indoor rock climbing gym that offers climbing, yoga, and other forms of fitness.\n\nWe aim to provide an experience that is accessible and enriches the lives of members, guests, and the surrounding community.\n\nClimbing is at the heart of everything we do. We strive to create a memorable experience for all who visit our facility. At the heart of our brand is a team of skilled, passionate routesetters, instructors, and staff who are here to help you reach your climbing goals.",
+  "coreValuesHeadline": "CORE VALUES",
+  "coreValues": [
+    {
+      "title": "CONSCIOUSLY AWARE",
+      "content": ""
+    },
+    {
+      "title": "RADICALLY BOLD",
+      "content": ""
+    },
+    {
+      "title": "IMPACT DRIVEN",
+      "content": ""
+    },
+    {
+      "title": "REMAIN AUTHENTIC",
+      "content": ""
+    },
+    {
+      "title": "GET STOKED, STAY STOKED",
+      "content": ""
+    }
+  ],
+  "meetTheTeamHeadline": "MEET THE TEAM",
+  "meetTheTeamIntro": "A business is only as good as their team of people. Lucky for us, our team is incredible. We hope you get a chance to meet every friendly, knowledgeable face on staff during your time at the gym.",
+  "teamSections": {
+    "ownersHeadline": "OWNERS & MANAGERS",
+    "coordinatorsHeadline": "COORDINATORS",
+    "staffHeadline": "STAFF & INSTRUCTORS"
+  },
+  "faqHeadline": "FREQUENTLY ASKED QUESTIONS",
+  "faqIntro": "Don't see your an answer to your Q? Send us an email info@climbtheknot.com",
+  "faqItems": [
+    {
+      "title": "DO YOU OFFER DAY PASSES?",
+      "content": "Yes! We offer day passes for $25 which includes access to all climbing areas, yoga classes, and the training area. Rental gear is available for an additional fee. Day passes are a great way to try out the gym before committing to a membership."
+    },
+    {
+      "title": "WHAT'S INCLUDED WITH MY MEMBERSHIP?",
+      "content": "Your membership includes unlimited access to all climbing areas (bouldering and top-rope), yoga classes, the training area, and gear rentals. Members also receive discounts at local partner businesses and priority registration for events and classes."
+    },
+    {
+      "title": "HOW DOES BILLING WORK?",
+      "content": "Memberships are billed monthly on your sign-up date. When you join, you only pay for the remaining days in your first month, then $80/month thereafter. You can manage your billing, freeze your membership, or cancel anytime through the member portal."
+    },
+    {
+      "title": "HOW DO I GIVE FEEDBACK?",
+      "content": "Enjoyed the gym or think something could be improved? Let us know your thoughts! Have other questions? Send us an email instead at info@climbtheknot.com",
+      "buttonText": "SUBMIT FEEDBACK",
+      "buttonLink": "https://forms.gle/feedback"
+    }
+  ],
+  "feedbackButtons": [
+    {
+      "text": "SUBMIT FEEDBACK",
+      "url": "https://forms.gle/feedback"
+    },
+    {
+      "text": "CONTACT US",
+      "url": "mailto:info@climbtheknot.com"
+    }
+  ]
+}

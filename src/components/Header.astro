@@ -14,9 +14,9 @@ const logoHeight = isHome ? 89 : 55;
 
 const navItems = [
   { label: 'ABOUT & FAQ', href: '/about' },
-  { label: 'NEW CLIMBERS', href: '/new-climber' },
+  { label: 'NEW CLIMBERS', href: '/new-climbers' },
   { label: 'MEMBERSHIP', href: '/membership' },
-  { label: 'CLASSES', href: '/classes', isPopup: true },
+  { label: 'CLASSES', href: '/classes' },
   { label: 'AMENITIES', href: '/amenities' },
   { label: 'EVENTS', href: '/events' },
   { label: 'SHOP', href: '/shop' },
@@ -28,21 +28,33 @@ const currentPath = Astro.url.pathname;
 <header
   class:list={['header', { 'header--home': isHome, 'header--page': !isHome }]}
   style={`top: ${bannerHeight}px`}
+  data-header-root
 >
-  <nav class="header__nav">
+  <nav class="header__nav" aria-label="Main navigation">
     <!-- Mobile Menu (React Island) -->
     <div class="header__mobile">
       <HeaderMobile client:load navItems={navItems} isHome={isHome} />
     </div>
 
     <!-- Logo -->
-    <a href="/" class="header__logo-link" aria-label="The Knot - Home">
+    <a href="/" class="header__logo-link" aria-label="The Knot Climbing Gym - Home">
       <img
         src="/images/logos/Logo Horizontal 2.png"
         alt="The Knot Climbing Gym"
         width={logoWidth}
         height={logoHeight}
-        class="header__logo"
+        class="header__logo header__logo--dark"
+        fetchpriority="high"
+        decoding="async"
+      />
+      <img
+        src="/images/logos/Logo Horizontal White.png"
+        alt="The Knot Climbing Gym"
+        width={logoWidth}
+        height={logoHeight}
+        class="header__logo header__logo--light"
+        fetchpriority="high"
+        decoding="async"
       />
     </a>
 
@@ -69,7 +81,7 @@ const currentPath = Astro.url.pathname;
     right: 0;
     z-index: 1000;
     padding: 16px 32px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
   }
 
   .header--home {
@@ -79,6 +91,12 @@ const currentPath = Astro.url.pathname;
   .header--page {
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .header--scrolled {
+    background-color: rgba(0, 0, 0, 0.72);
+    box-shadow: none;
+    backdrop-filter: blur(8px);
   }
 
   .header__nav {
@@ -91,6 +109,7 @@ const currentPath = Astro.url.pathname;
 
   .header__mobile {
     display: none;
+    align-items: center;
   }
 
   .header__logo-link {
@@ -98,28 +117,38 @@ const currentPath = Astro.url.pathname;
     align-items: center;
   }
 
-  .header__logo {
-    object-fit: contain;
-    transition: width 0.3s ease, height 0.3s ease;
-  }
-
   .header__desktop-nav {
     display: flex;
-    gap: 32px;
+    gap: clamp(12px, 1.5vw, 32px);
     list-style: none;
     margin: 0;
     padding: 0;
+    flex-shrink: 1;
   }
 
   .header__nav-link {
-    color: black;
     font-family: var(--font-heading);
-    font-size: 14px;
-    font-weight: 900;
+    font-size: clamp(10px, 1vw, 14px);
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-decoration: none;
     transition: opacity 0.2s ease;
+    white-space: nowrap;
+  }
+
+  /* White text on home page (over dark hero) */
+  .header--home .header__nav-link {
+    color: white;
+  }
+
+  /* Black text on other pages (white background) */
+  .header--page .header__nav-link {
+    color: black;
+  }
+
+  .header--scrolled .header__nav-link {
+    color: #e8e8e8;
   }
 
   .header__nav-link:hover {
@@ -130,36 +159,81 @@ const currentPath = Astro.url.pathname;
     color: var(--color-rust);
   }
 
-  /* Tablet */
-  @media (max-width: 1024px) {
-    .header__desktop-nav {
-      gap: 20px;
-    }
+  .header--scrolled .header__nav-link--active {
+    color: #fff;
+  }
 
+  .header__logo {
+    flex-shrink: 0;
+    width: clamp(180px, 20vw, 300px);
+    height: auto;
+  }
+
+  .header__logo--light {
+    display: none;
+  }
+
+  .header--home .header__logo--dark {
+    display: none;
+  }
+
+  .header--home .header__logo--light {
+    display: block;
+  }
+
+  .header--scrolled .header__logo--dark {
+    display: none;
+  }
+
+  .header--scrolled .header__logo--light {
+    display: block;
+  }
+
+  /* Large screens */
+  @media (min-width: 1400px) {
     .header__nav-link {
-      font-size: 12px;
+      font-size: 14px;
     }
 
-    .header__logo {
-      width: 220px;
-      height: 46px;
+    .header__desktop-nav {
+      gap: 32px;
     }
   }
 
-  /* Mobile */
-  @media (max-width: 768px) {
-    .header {
-      padding: 16px 20px;
+  /* Medium screens */
+  @media (max-width: 1200px) {
+    .header__logo {
+      width: 200px;
     }
+  }
 
-    .header__nav {
-      justify-content: flex-start;
-      gap: 16px;
+  /* Tablet - switch to mobile menu at 768px */
+  @media (max-width: 768px) {
+    .header__desktop-nav {
+      display: none;
     }
 
     .header__mobile {
       display: flex;
-      align-items: center;
+    }
+
+    .header__logo {
+      width: 180px;
+    }
+  }
+
+  /* Mobile - smaller screens refinement */
+  @media (max-width: 480px) {
+    .header {
+      padding: 12px 16px;
+    }
+
+    .header__nav {
+      justify-content: flex-start;
+      gap: 12px;
+    }
+
+    .header__mobile {
       order: 1;
     }
 
@@ -168,12 +242,25 @@ const currentPath = Astro.url.pathname;
     }
 
     .header__logo {
-      width: 180px;
-      height: 37px;
-    }
-
-    .header__desktop-nav {
-      display: none;
+      width: 160px;
     }
   }
 </style>
+
+<script is:inline>
+  (() => {
+    const header = document.querySelector('[data-header-root]');
+    if (!header) return;
+
+    const toggleScrolled = () => {
+      if (window.scrollY > 24) {
+        header.classList.add('header--scrolled');
+      } else {
+        header.classList.remove('header--scrolled');
+      }
+    };
+
+    toggleScrolled();
+    window.addEventListener('scroll', toggleScrolled, { passive: true });
+  })();
+</script>

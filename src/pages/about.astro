@@ -2,87 +2,92 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TeamMemberCard from '../components/TeamMemberCard.astro';
 import Accordion from '../components/Accordion.tsx';
+import { getCollection } from 'astro:content';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const ownersManagers = [
-  { name: 'MIKE PALMER', title: 'Owner / CEO', image: '/images/canva-final/team-mike-palmer.jpg' },
-  { name: 'MITCH EADENS', title: 'Owner / COO', image: '/images/canva-final/team-mitch-eadens.jpg' },
-  { name: 'TULSA CURTIS', title: 'Operations Manager', image: '/images/canva-final/team-tulsa-curtis.jpg' },
-  { name: 'ASHLEY MARCONE', title: 'Head Setter', image: '/images/canva-final/team-ashley-marcone.jpg' },
-  { name: 'ZACH LANDRY', title: 'Risk Mgmt & Tech Mgr', image: '/images/canva-final/team-zach-landry.jpg' },
-];
+// Load about page content from Keystatic
+let aboutPage;
+try {
+  const aboutPathCandidates = [
+    path.join(process.cwd(), 'src/content/pages/about/index.json'),
+    path.join(process.cwd(), 'src/content/pages/about.json'),
+  ];
+  const aboutPagePath =
+    aboutPathCandidates.find((candidatePath) => fs.existsSync(candidatePath)) ||
+    aboutPathCandidates[0];
+  const raw = fs.readFileSync(aboutPagePath, 'utf-8');
+  aboutPage = JSON.parse(raw);
+} catch (e) {
+  // Fallback if file doesn't exist
+  aboutPage = {
+    hero: { headline: 'ABOUT & FAQ', backgroundImage: '/images/canva-final/about-building-facade.jpg' },
+    coreValuesHeadline: 'CORE VALUES',
+    coreValues: [],
+    teamSections: {
+      ownersHeadline: 'OWNERS & MANAGERS',
+      coordinatorsHeadline: 'COORDINATORS',
+      staffHeadline: 'DESK STAFF & INSTRUCTORS',
+    },
+    faqHeadline: 'FREQUENTLY ASKED QUESTIONS',
+    faqItems: [],
+    feedbackButtons: [],
+  };
+}
 
-const coordinators = [
-  { name: 'ASH', title: 'Coordinator', image: '/images/canva-final/staff-ash.jpg' },
-  { name: 'CLAUDIA', title: 'Coordinator', image: '/images/canva-final/staff-claudia.jpg' },
-  { name: 'RICK', title: 'Coordinator', image: '/images/canva-final/staff-rick.jpg' },
-  { name: 'AMANDA', title: 'Coordinator', image: '/images/canva-final/staff-amanda.jpg' },
-  { name: 'NATALIE', title: 'Coordinator', image: '/images/canva-final/staff-natalie.jpg' },
-];
+// Load team members from Keystatic
+const allTeamMembers = await getCollection('team');
+const toPublicUrl = (libraryPath?: string) =>
+  libraryPath && libraryPath.startsWith('public/')
+    ? `/${libraryPath.slice('public/'.length)}`
+    : undefined;
 
-const deskStaff = [
-  { name: 'G', title: 'Staff', image: '/images/canva-final/staff-g.jpg' },
-  { name: 'BEN', title: 'Staff', image: '/images/canva-final/staff-ben.jpg' },
-  { name: 'ANDREW', title: 'Staff', image: '/images/canva-final/staff-andrew.jpg' },
-  { name: 'STEVE', title: 'Staff', image: '/images/canva-final/staff-steve.jpg' },
-  { name: 'CARLEY', title: 'Staff', image: '/images/canva-final/staff-carley.jpg' },
-  { name: 'TALIA', title: 'Staff', image: '/images/canva-final/staff-talia.jpg' },
-  { name: 'SARAH', title: 'Staff', image: '/images/canva-final/staff-sarah.jpg' },
-  { name: 'SHANE', title: 'Staff', image: '/images/canva-final/staff-shane.jpg' },
-  { name: 'YAN', title: 'Staff', image: '/images/canva-final/staff-yan.jpg' },
-  { name: 'AARON', title: 'Staff', image: '/images/canva-final/staff-aaron.png' },
-];
+// Sort team members by order and categorize
+const sortedTeam = allTeamMembers.sort((a, b) => (a.data.order || 99) - (b.data.order || 99));
+const getTeamGroup = (member: (typeof allTeamMembers)[number]) => {
+  const explicitGroup = member.data.teamGroup;
+  if (explicitGroup === 'leadership' || explicitGroup === 'coordinator' || explicitGroup === 'staff') {
+    return explicitGroup;
+  }
 
-const coreValuesItems = [
-  {
-    title: 'CONSCIOUSLY AWARE',
-    content: 'We are mindful of our impact on the environment, our community, and each other. Every decision we make considers the broader implications for the climbing community and the world around us.',
-  },
-  {
-    title: 'RADICALLY BOLD',
-    content: 'We push boundaries and encourage climbers to step outside their comfort zones. Growth happens when we challenge ourselves and embrace the unknown.',
-  },
-  {
-    title: 'IMPACT DRIVEN',
-    content: 'Everything we do is focused on making a positive difference. From supporting local climbing initiatives to fostering an inclusive community, we measure success by the impact we create.',
-  },
-  {
-    title: 'REMAIN AUTHENTIC',
-    content: 'We stay true to who we are and what we believe in. Authenticity builds trust, and trust builds community. We are genuine in our interactions and transparent in our operations.',
-  },
-  {
-    title: 'GET STOKED, STAY STOKED',
-    content: 'Climbing is fun! We maintain enthusiasm and passion for what we do, and we share that energy with everyone who walks through our doors. Stoke is contagious.',
-  },
-];
+  // Backward-compatible fallback for pre-migration content
+  if (member.data.isLeadership) return 'leadership';
+  if ((member.data.role || '').trim().toLowerCase() === 'coordinator') return 'coordinator';
+  return 'staff';
+};
 
-const faqItems = [
-  {
-    title: 'DO YOU OFFER DAY PASSES?',
-    content: 'Yes! We offer day passes for $25 which includes access to all climbing areas, yoga classes, and the training area. Rental gear is available for an additional fee. Day passes are a great way to try out the gym before committing to a membership.',
-  },
-  {
-    title: "WHAT'S INCLUDED WITH MY MEMBERSHIP?",
-    content: 'Your membership includes unlimited access to all climbing areas (bouldering and top-rope), yoga classes, the training area, and gear rentals. Members also receive discounts at local partner businesses and priority registration for events and classes.',
-  },
-  {
-    title: 'HOW DOES BILLING WORK?',
-    content: 'Memberships are billed monthly on your sign-up date. When you join, you only pay for the remaining days in your first month, then $80/month thereafter. You can manage your billing, freeze your membership, or cancel anytime through the member portal.',
-  },
-  {
-    title: 'DO I NEED CLIMBING EXPERIENCE?',
-    content: 'Not at all! We welcome climbers of all experience levels, from complete beginners to seasoned pros. Our Intro to Climbing classes are perfect for first-timers and cover all the basics including safety, techniques, and gym etiquette. Our staff is always available to help you get started.',
-  },
-  {
-    title: 'WHAT ARE YOUR HOURS?',
-    content: "We're open Monday through Friday from 6am to 10pm, Saturday from 8am to 8pm, and Sunday from 9am to 6pm. Holiday hours may vary, so check our social media or call ahead on major holidays.",
-  },
-  {
-    title: 'HOW DO I GIVE FEEDBACK?',
-    content: 'Enjoyed the gym or think something could be improved? Let us know your thoughts! Have other questions? Send us an email instead at info@climbtheknot.com',
-    buttonText: 'SUBMIT FEEDBACK',
-    buttonLink: 'https://forms.gle/feedback',
-  },
-];
+const ownersManagers = sortedTeam
+  .filter(member => getTeamGroup(member) === 'leadership')
+  .map(member => ({
+    name: member.data.name,
+    title: member.data.role,
+    image: toPublicUrl(member.data.photoLibraryPath) || member.data.photo,
+  }));
+
+const coordinators = sortedTeam
+  .filter(member => getTeamGroup(member) === 'coordinator')
+  .map(member => ({
+    name: member.data.name,
+    title: member.data.role,
+    image: toPublicUrl(member.data.photoLibraryPath) || member.data.photo,
+  }));
+
+const deskStaff = sortedTeam
+  .filter(member => getTeamGroup(member) === 'staff')
+  .map(member => ({
+    name: member.data.name,
+    title: member.data.role,
+    image: toPublicUrl(member.data.photoLibraryPath) || member.data.photo,
+  }));
+
+// Get core values and FAQ from aboutPage singleton
+const coreValuesItems = aboutPage?.coreValues || [];
+const faqItems = aboutPage?.faqItems || [];
+const aboutHeroFromCms = toPublicUrl(aboutPage?.hero?.backgroundImageLibraryPath) || aboutPage?.hero?.backgroundImage;
+const aboutHeroImage =
+  aboutHeroFromCms === '/images/canva-final/about-building-facade.jpg'
+    ? '/images/canva-final/about-building-facade-1366.jpg'
+    : (aboutHeroFromCms || '/images/canva-final/about-building-facade-1366.jpg');
 ---
 
 <BaseLayout title="About & FAQ">
@@ -91,29 +96,53 @@ const faqItems = [
     <div class="hero-background">
       <div class="hero-overlay"></div>
       <img
-        src="/images/canva-final/about-building-facade.jpg"
+        src={aboutHeroImage}
         alt="The Knot Climbing Gym building exterior"
         class="hero-image"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        width="1366"
+        height="911"
       />
     </div>
     <div class="hero-content">
       <h1 class="hero-headline">
-        ABOUT & <a href="#faq" class="faq-link">FAQ</a>
+        {aboutPage?.hero?.headline || 'ABOUT & FAQ'}
       </h1>
     </div>
   </section>
 
+  <!-- About Intro Section -->
+  {aboutPage?.aboutIntro && (
+    <section class="about-intro-section">
+      <p class="about-intro-text">{aboutPage.aboutIntro}</p>
+    </section>
+  )}
+
   <!-- Core Values Section -->
   <section class="core-values-section">
-    <h2 class="section-heading">CORE VALUES</h2>
+    <h2 class="section-heading">{aboutPage?.coreValuesHeadline || 'CORE VALUES'}</h2>
     <div class="accordion-container">
       <Accordion client:visible items={coreValuesItems} />
     </div>
   </section>
 
+  <!-- Meet The Team Section -->
+  {(aboutPage?.meetTheTeamHeadline || aboutPage?.meetTheTeamIntro) && (
+    <section class="meet-the-team-section">
+      {aboutPage?.meetTheTeamHeadline && (
+        <h2 class="meet-the-team-heading">{aboutPage.meetTheTeamHeadline}</h2>
+      )}
+      {aboutPage?.meetTheTeamIntro && (
+        <p class="meet-the-team-intro">{aboutPage.meetTheTeamIntro}</p>
+      )}
+    </section>
+  )}
+
   <!-- Owners & Managers Section -->
   <section class="team-section owners-section">
-    <h2 class="team-section-heading">OWNERS & MANAGERS</h2>
+    <h2 class="team-section-heading">{aboutPage?.teamSections?.ownersHeadline || 'OWNERS & MANAGERS'}</h2>
     <div class="team-grid owners-grid">
       {ownersManagers.map((member) => (
         <TeamMemberCard
@@ -128,7 +157,7 @@ const faqItems = [
 
   <!-- Coordinators Section -->
   <section class="team-section coordinators-section">
-    <h2 class="team-section-heading">COORDINATORS</h2>
+    <h2 class="team-section-heading">{aboutPage?.teamSections?.coordinatorsHeadline || 'COORDINATORS'}</h2>
     <div class="team-grid coordinators-grid">
       {coordinators.map((member) => (
         <TeamMemberCard
@@ -143,7 +172,7 @@ const faqItems = [
 
   <!-- Desk Staff & Instructors Section -->
   <section class="team-section staff-section">
-    <h2 class="team-section-heading staff-heading">DESK STAFF & INSTRUCTORS</h2>
+    <h2 class="team-section-heading staff-heading">{aboutPage?.teamSections?.staffHeadline || 'DESK STAFF & INSTRUCTORS'}</h2>
     <div class="team-grid staff-grid">
       {deskStaff.map((member) => (
         <TeamMemberCard
@@ -158,25 +187,24 @@ const faqItems = [
 
   <!-- FAQ Section -->
   <section id="faq" class="faq-section">
-    <h2 class="section-heading">FREQUENTLY ASKED QUESTIONS</h2>
+    <h2 class="section-heading">{aboutPage?.faqHeadline || 'FREQUENTLY ASKED QUESTIONS'}</h2>
+    {aboutPage?.faqIntro && (
+      <p class="faq-intro-text">{aboutPage.faqIntro}</p>
+    )}
     <div class="accordion-container">
       <Accordion client:visible items={faqItems} />
     </div>
     <div class="feedback-buttons">
-      <a 
-        href="https://forms.gle/feedback" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="feedback-button submit-btn"
-      >
-        SUBMIT FEEDBACK
-      </a>
-      <a 
-        href="mailto:info@climbtheknot.com" 
-        class="feedback-button contact-btn"
-      >
-        CONTACT US
-      </a>
+      {aboutPage?.feedbackButtons?.map((button: { text: string; url: string }) => (
+        <a
+          href={button.url}
+          target={button.url.startsWith('http') ? '_blank' : undefined}
+          rel={button.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+          class="feedback-button"
+        >
+          {button.text}
+        </a>
+      ))}
     </div>
   </section>
 </BaseLayout>
@@ -184,7 +212,7 @@ const faqItems = [
 <style>
   .hero-section {
     position: relative;
-    min-height: 60vh;
+    min-height: 50vh;
     width: 100%;
     display: flex;
     align-items: flex-end;
@@ -242,6 +270,21 @@ const faqItems = [
     text-decoration: underline;
   }
 
+  .about-intro-section {
+    padding: 48px 24px;
+    background-color: #000;
+    text-align: center;
+  }
+
+  .about-intro-text {
+    max-width: 900px;
+    margin: 0 auto;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
   .core-values-section {
     padding: 64px 24px;
     background-color: #000;
@@ -263,6 +306,31 @@ const faqItems = [
     margin: 0 auto;
   }
 
+  .meet-the-team-section {
+    padding: 64px 24px 0;
+    background-color: #fff;
+    text-align: center;
+  }
+
+  .meet-the-team-heading {
+    font-family: var(--font-heading, 'Zing Rust', sans-serif);
+    font-size: 32px;
+    font-weight: 900;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+    letter-spacing: 2px;
+  }
+
+  .meet-the-team-intro {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #333;
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
   .team-section {
     padding: 64px 24px;
     background-color: #fff;
@@ -276,7 +344,7 @@ const faqItems = [
     font-family: var(--font-heading, 'Zing Rust', sans-serif);
     font-size: 24px;
     font-weight: 900;
-    color: var(--color-coral, #D89B92);
+    color: #9e4b45;
     text-transform: uppercase;
     margin: 0 0 40px 0;
     letter-spacing: 2px;
@@ -312,6 +380,16 @@ const faqItems = [
   .faq-section {
     padding: 64px 24px;
     background-color: #000;
+  }
+
+  .faq-intro-text {
+    max-width: 900px;
+    margin: 0 auto 32px;
+    color: #ccc;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
   }
 
   .feedback-buttons {
@@ -366,6 +444,14 @@ const faqItems = [
       font-size: 42px;
     }
 
+    .about-intro-section {
+      padding: 32px 16px;
+    }
+
+    .about-intro-text {
+      font-size: 16px;
+    }
+
     .core-values-section {
       padding: 48px 16px;
     }
@@ -373,6 +459,18 @@ const faqItems = [
     .section-heading {
       font-size: 24px;
       margin-bottom: 32px;
+    }
+
+    .meet-the-team-section {
+      padding: 48px 16px 0;
+    }
+
+    .meet-the-team-heading {
+      font-size: 24px;
+    }
+
+    .meet-the-team-intro {
+      font-size: 16px;
     }
 
     .team-section {

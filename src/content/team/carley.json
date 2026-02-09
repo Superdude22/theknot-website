@@ -2,7 +2,9 @@
   "name": "CARLEY",
   "role": "Staff",
   "bio": "",
-  "photo": "/images/canva-final/staff-carley.jpg",
+  "photo": "/images/canva-final/carley/staff-carley.jpg",
   "order": 24,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "staff",
+  "photoLibraryPath": "public/images/canva-final/carley/staff-carley.jpg"
 }

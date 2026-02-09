@@ -2,8 +2,8 @@
 interface Card {
   label: string;
   description: string;
-  buttonText: string;
-  buttonLink: string;
+  buttonText?: string;
+  buttonLink?: string;
   image?: string;
 }
 
@@ -59,14 +59,16 @@ const placeholderColors = [
         <div class="card__content">
           <h3 class="card__label">{card.label}</h3>
           <p class="card__description">{card.description}</p>
-          <a
-            href={card.buttonLink}
-            class="btn-secondary card__button"
-            target={card.buttonLink.startsWith('http') ? '_blank' : undefined}
-            rel={card.buttonLink.startsWith('http') ? 'noopener noreferrer' : undefined}
-          >
-            {card.buttonText}
-          </a>
+          {card.buttonText && card.buttonLink && (
+            <a
+              href={card.buttonLink}
+              class="btn-secondary card__button"
+              target={card.buttonLink.startsWith('http') ? '_blank' : undefined}
+              rel={card.buttonLink.startsWith('http') ? 'noopener noreferrer' : undefined}
+            >
+              {card.buttonText}
+            </a>
+          )}
         </div>
       </div>
     ))}
@@ -106,7 +108,7 @@ const placeholderColors = [
   }
 
   .card__image-container {
-    aspect-ratio: 4/3;
+    aspect-ratio: 565/260;
     overflow: hidden;
   }
 

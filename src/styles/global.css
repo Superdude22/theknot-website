@@ -45,7 +45,7 @@
 
 @font-face {
   font-family: 'Uniform Pro';
-  src: url('/fonts/Uniform Pro fonts/Fonts/Uniform-Ultra.otf') format('opentype');
+  src: url('/fonts/Uniform-Black.otf') format('opentype');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -53,7 +53,9 @@
 
 @font-face {
   font-family: 'Rubik';
-  src: url('/fonts/RUBIK.ttf') format('truetype');
+  src:
+    url('/fonts/RUBIK.woff2') format('woff2'),
+    url('/fonts/RUBIK.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -61,8 +63,30 @@
 
 @font-face {
   font-family: 'Rubik';
-  src: url('/fonts/RUBIK ITALIC.ttf') format('truetype');
+  src:
+    url('/fonts/RUBIK-ITALIC.woff2') format('woff2'),
+    url('/fonts/RUBIK ITALIC.ttf') format('truetype');
   font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src:
+    url('/fonts/RUBIK.woff2') format('woff2'),
+    url('/fonts/RUBIK.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src:
+    url('/fonts/RUBIK-ITALIC.woff2') format('woff2'),
+    url('/fonts/RUBIK ITALIC.ttf') format('truetype');
+  font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
@@ -84,6 +108,35 @@
   --font-display: 'Zing Rust', 'Uniform Pro', sans-serif;
   --font-heading: 'Uniform Pro', sans-serif;
   --font-body: 'Rubik', 'Uniform Pro', sans-serif;
+
+  /* Typography Design Tokens */
+  --heading-xl-family: 'Uniform Pro', sans-serif;
+  --heading-xl-size: 56px;
+  --heading-xl-weight: 900;
+  --heading-xl-spacing: -0.02em;
+  --heading-xl-line-height: 1;
+  --heading-xl-transform: uppercase;
+
+  --subheading-family: 'Rubik', sans-serif;
+  --subheading-size: 14px;
+  --subheading-weight: 700;
+  --subheading-line-height: 1.5;
+  --subheading-transform: uppercase;
+
+  --body-text-family: 'Rubik', sans-serif;
+  --body-text-size: 14px;
+  --body-text-weight: 700;
+  --body-text-style: italic;
+  --body-text-line-height: 1.5;
+
+  /* Button Design Tokens */
+  --btn-blue-width: 500px;
+  --btn-blue-height: 55px;
+  --btn-blue-bg: var(--color-manatee);
+
+  --btn-red-width: 225px;
+  --btn-red-height: 55px;
+  --btn-red-bg: var(--color-rust);
 }
 
 /* Base Styles */
@@ -99,11 +152,138 @@ body {
   padding: 0;
 }
 
+/* Performance Optimizations */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Improve rendering performance for off-screen content */
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+/* Focus Indicators - WCAG 2.4.7 */
+*:focus-visible {
+  outline: 3px solid var(--color-manatee);
+  outline-offset: 2px;
+}
+
+/* Enhanced focus for interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--color-manatee);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link for keyboard navigation */
+.skip-to-main {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1em;
+  background-color: var(--color-rust);
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.skip-to-main:focus {
+  left: 0;
+  top: 0;
+}
+
 /* Utility Classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Typography Utility Classes */
+.heading-xl {
+  font-family: var(--heading-xl-family);
+  font-size: var(--heading-xl-size);
+  font-weight: var(--heading-xl-weight);
+  letter-spacing: var(--heading-xl-spacing);
+  line-height: var(--heading-xl-line-height);
+  text-transform: var(--heading-xl-transform);
+}
+
+.subheading {
+  font-family: var(--subheading-family);
+  font-size: var(--subheading-size);
+  font-weight: var(--subheading-weight);
+  line-height: var(--subheading-line-height);
+  text-transform: var(--subheading-transform);
+}
+
+.body-text {
+  font-family: var(--body-text-family);
+  font-size: var(--body-text-size);
+  font-weight: var(--body-text-weight);
+  font-style: var(--body-text-style);
+  line-height: var(--body-text-line-height);
+}
+
+/* Button Design Token Classes */
+.btn-blue {
+  width: var(--btn-blue-width);
+  height: var(--btn-blue-height);
+  background-color: var(--btn-blue-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  transition: opacity 200ms;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-blue:hover {
+  opacity: 0.9;
+}
+
+.btn-blue:focus-visible {
+  outline: 3px solid var(--color-rust);
+  outline-offset: 2px;
+}
+
+.btn-red {
+  width: var(--btn-red-width);
+  height: var(--btn-red-height);
+  background-color: var(--btn-red-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  transition: opacity 200ms;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-red:hover {
+  opacity: 0.9;
+}
+
+.btn-red:focus-visible {
+  outline: 3px solid var(--color-manatee);
+  outline-offset: 2px;
 }
 
 /* Button Base Styles */

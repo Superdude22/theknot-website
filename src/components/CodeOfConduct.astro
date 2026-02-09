@@ -1,0 +1,92 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+let codeOfConduct = {
+  headline: 'CODE OF CONDUCT',
+  paragraphs: [
+    'At The Knot Climbing Gym, we are committed to providing a welcoming, inclusive, and safe environment for all of our climbers and staff. We believe that everyone deserves to feel respected and valued while enjoying their time in our facility.',
+    "As such, we have a zero-tolerance policy for any form of harassment, discrimination, violence, suggestion of violence, hate speech, or any other unwanted behavior that makes others feel uncomfortable. This policy may (at management's sole discretion) be applied to behavior both inside and outside The Knot Climbing Gym.",
+  ],
+};
+
+try {
+  const homePathCandidates = [
+    path.join(process.cwd(), 'src/content/pages/home.json'),
+    path.join(process.cwd(), 'src/content/pages/home/index.json'),
+  ];
+  const homePagePath =
+    homePathCandidates.find((candidatePath) => fs.existsSync(candidatePath)) ||
+    homePathCandidates[0];
+  const raw = fs.readFileSync(homePagePath, 'utf-8');
+  const homeContent = JSON.parse(raw);
+  if (homeContent?.codeOfConduct) {
+    codeOfConduct = { ...codeOfConduct, ...homeContent.codeOfConduct };
+  }
+} catch (e) {
+  // Use defaults
+}
+---
+
+<section class="coc-section">
+  <h2 class="coc-heading">{codeOfConduct.headline}</h2>
+  {codeOfConduct.paragraphs.map((paragraph: string) => (
+    <p class="coc-text">{paragraph}</p>
+  ))}
+</section>
+
+<style>
+  .coc-section {
+    padding: 40px 48px 28px;
+    background: #000;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .coc-heading {
+    margin: 0 0 20px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .coc-text {
+    margin: 0 0 16px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .coc-text:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .coc-text {
+      font-size: 16px;
+    }
+
+    .coc-heading {
+      font-size: 30px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .coc-section {
+      padding: 32px 24px 20px;
+    }
+  }
+
+  @media (max-width: 375px) {
+    .coc-section {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+</style>

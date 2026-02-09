@@ -2,7 +2,9 @@
   "name": "G",
   "role": "Staff",
   "bio": "",
-  "photo": "/images/canva-final/staff-g.jpg",
+  "photo": "/images/canva-final/g/staff-g.jpg",
   "order": 20,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "staff",
+  "photoLibraryPath": "public/images/canva-final/g/staff-g.jpg"
 }

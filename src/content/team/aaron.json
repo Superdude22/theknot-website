@@ -2,7 +2,9 @@
   "name": "AARON",
   "role": "Staff",
   "bio": "",
-  "photo": "/images/canva-final/staff-aaron.png",
+  "photo": "/images/canva-final/aaron/staff-aaron.png",
   "order": 29,
-  "isLeadership": false
+  "isLeadership": false,
+  "teamGroup": "staff",
+  "photoLibraryPath": "public/images/canva-final/aaron/staff-aaron.png"
 }
